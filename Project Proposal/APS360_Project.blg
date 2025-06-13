@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: APS360_Project.aux
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'name_of_file' (item size: 1) to 20 items.
+The style file: iclr2022_conference.bst
+Database file #1: APS360_ref.bib
+You've used 30 entries,
+            2773 wiz_defined-function locations,
+            772 strings with 10214 characters,
+and the built_in function-call counts, 13446 in all, are:
+= -- 1213
+> -- 779
+< -- 21
++ -- 272
+- -- 240
+* -- 1050
+:= -- 2103
+add.period$ -- 112
+call.type$ -- 30
+change.case$ -- 163
+chr.to.int$ -- 28
+cite$ -- 60
+duplicate$ -- 585
+empty$ -- 1096
+format.name$ -- 276
+if$ -- 2813
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 20
+newline$ -- 180
+num.names$ -- 120
+pop$ -- 334
+preamble$ -- 1
+purify$ -- 133
+quote$ -- 0
+skip$ -- 457
+stack$ -- 0
+substring$ -- 407
+swap$ -- 67
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 330
+warning$ -- 0
+while$ -- 118
+width$ -- 0
+write$ -- 431
