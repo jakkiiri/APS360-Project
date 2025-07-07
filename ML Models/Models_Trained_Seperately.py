@@ -59,7 +59,21 @@ class CachedDataset(Dataset):
         binary_label = 0 if label == 0 else 1
         return image, binary_label, label
 
-# --- Data Loader ---
+# --- Filtered Dataset for Multi-Class (non-nevus only) ---
+class FilteredDataset(Dataset):
+    def __init__(self, files):
+        self.files = files
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, idx):
+        data = torch.load(self.files[idx], weights_only=True)
+        image = data['image']
+        label = data['label']
+        return image, label
+
+# --- Data Loaders ---
 def get_loaders(train_dir, val_dir, batch_size=32):
     train_dataset = CachedDataset(train_dir)
     val_dataset = CachedDataset(val_dir)
@@ -91,9 +105,16 @@ def get_loaders(train_dir, val_dir, batch_size=32):
     train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
-    return train_loader, val_loader
+    # ➜ Create multi-class loaders (non-nevus only)
+    multi_train_files = [file for file in train_dataset.files if torch.load(file, weights_only=True)['label'] != 0]
+    multi_val_files = [file for file in val_dataset.files if torch.load(file, weights_only=True)['label'] != 0]
 
-# --- Model Builder ---
+    multi_train_loader = DataLoader(FilteredDataset(multi_train_files), batch_size=batch_size, shuffle=True, num_workers=0)
+    multi_val_loader = DataLoader(FilteredDataset(multi_val_files), batch_size=batch_size, shuffle=False, num_workers=0)
+
+    return train_loader, val_loader, multi_train_loader, multi_val_loader
+
+# --- Backbone Feature Extractor ---
 class BackboneExtractor(nn.Module):
     def __init__(self, backbone):
         super(BackboneExtractor, self).__init__()
@@ -120,8 +141,6 @@ class BackboneExtractor(nn.Module):
         return pooled.view(pooled.size(0), -1)
 
 # --- Training Function ---
-from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
-
 def train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience=3, mode='binary', backbone_name='model'):
     feature_dim = None
     if isinstance(backbone, models.MobileNetV2):
@@ -171,9 +190,14 @@ def train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience
         train_labels, train_preds = [], []
         train_pbar = tqdm(train_loader, desc=f'Training ({mode})', ncols=150)
 
-        for inputs, binary_targets, multi_targets in train_pbar:
+        for batch in train_pbar:
+            if mode == 'binary':
+                inputs, binary_targets, _ = batch
+                targets = binary_targets.to(device).float()
+            else:
+                inputs, targets = batch
+
             inputs = inputs.to(device)
-            targets = binary_targets.to(device).float() if mode == 'binary' else multi_targets.to(device)
 
             optimizer.zero_grad()
             features = backbone_extractor(inputs)
@@ -207,9 +231,14 @@ def train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience
 
         val_pbar = tqdm(val_loader, desc=f'Validation ({mode})', ncols=150)
         with torch.no_grad():
-            for inputs, binary_targets, multi_targets in val_pbar:
+            for batch in val_pbar:
+                if mode == 'binary':
+                    inputs, binary_targets, _ = batch
+                    targets = binary_targets.to(device).float()
+                else:
+                    inputs, targets = batch
+
                 inputs = inputs.to(device)
-                targets = binary_targets.to(device).float() if mode == 'binary' else multi_targets.to(device)
 
                 features = backbone_extractor(inputs)
                 outputs = classifier(features)
@@ -254,7 +283,6 @@ def train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience
 
         torch.cuda.empty_cache()
 
-    # --- Confusion Matrix ---
     ConfusionMatrixDisplay(confusion_matrix(val_labels, val_preds)).plot()
     plt.title(f'{backbone_name} {mode.capitalize()} Classifier Confusion Matrix')
     plt.show()
@@ -268,26 +296,23 @@ def train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience
     plt.legend()
     plt.show()
 
-
 # --- Run Pipeline ---
-train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
+if __name__ == "__main__":
+    train_loader, val_loader, multi_train_loader, multi_val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
 
-for backbone_name in ['mobilenet', 'resnet', 'efficientnet']:
-    print(f"\n🚀 Starting training for {backbone_name} backbone...")
+    for backbone_name in ['mobilenet', 'resnet', 'efficientnet']:
+        print(f"\n🚀 Starting training for {backbone_name} backbone...")
 
-    if backbone_name == 'mobilenet':
-        backbone = models.mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
-    elif backbone_name == 'resnet':
-        backbone = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-    elif backbone_name == 'efficientnet':
-        backbone = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
+        if backbone_name == 'mobilenet':
+            backbone = models.mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
+        elif backbone_name == 'resnet':
+            backbone = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+        elif backbone_name == 'efficientnet':
+            backbone = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
 
-    # Freeze all backbone layers
-    for param in backbone.parameters():
-        param.requires_grad = False
+        for param in backbone.parameters():
+            param.requires_grad = False
 
-    # Train Binary Classifier
-    train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience=3, mode='binary', backbone_name=backbone_name)
+        train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience=3, mode='binary', backbone_name=backbone_name)
 
-    # Train Multi-Class Classifier
-    train_classifier(backbone, train_loader, val_loader, num_epochs=15, patience=3, mode='multi', backbone_name=backbone_name)
+        train_classifier(backbone, multi_train_loader, multi_val_loader, num_epochs=15, patience=3, mode='multi', backbone_name=backbone_name)

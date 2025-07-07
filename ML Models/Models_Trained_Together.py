@@ -43,6 +43,7 @@ transform = transforms.Compose([
 ])
 
 # --- Caching Function ---
+# --- Caching Function ---
 def create_cache(split_name):
     split_path = os.path.join(split_dir, split_name)
     cache_dir = os.path.join(cache_root, split_name)
@@ -66,29 +67,36 @@ def create_cache(split_name):
             save_path = os.path.join(cache_label_dir, image_file.replace('.jpg', '.pt').replace('.png', '.pt'))
             torch.save({'image': image_tensor, 'label': label_mapping[label]}, save_path)
 
-# --- Check Cache ---
-for split in ['train', 'val']:
-    if not os.path.exists(os.path.join(cache_root, split)):
-        create_cache(split)
-    else:
-        print(f"✅ Cache for {split} already exists. Skipping...")
 
-# --- Cached Dataset ---
+# --- File Indexing ---
+def create_file_index(dataset_dir):
+    from glob import glob
+    file_paths = glob(os.path.join(dataset_dir, '*', '*.pt'))
+    file_paths.sort()
+
+    index = []
+    for file in tqdm(file_paths, desc=f"Indexing {dataset_dir}"):
+        label = torch.load(file, weights_only=True)['label']
+        index.append((file, label))
+
+    torch.save(index, os.path.join(dataset_dir, 'file_index.pt'))
+
+
+# --- Cached Dataset using Index ---
 class CachedDataset(Dataset):
     def __init__(self, cache_dir):
-        from glob import glob
-        self.files = glob(os.path.join(cache_dir, '*', '*.pt'))
-        self.files.sort()
+        self.index = torch.load(os.path.join(cache_dir, 'file_index.pt'))
 
     def __len__(self):
-        return len(self.files)
+        return len(self.index)
 
     def __getitem__(self, idx):
-        data = torch.load(self.files[idx], weights_only=True)
+        file, label = self.index[idx]
+        data = torch.load(file, weights_only=True)
         image = data['image']
-        label = data['label']
         binary_label = 0 if label == 0 else 1
         return image, binary_label, label
+
 
 # --- Data Loader with Class Weights ---
 def get_loaders(train_dir, val_dir, batch_size=32):
@@ -98,8 +106,8 @@ def get_loaders(train_dir, val_dir, batch_size=32):
     train_labels = []
     binary_labels = []
 
-    for file in train_dataset.files:
-        label = torch.load(file, weights_only=True)['label']
+    # Load labels from index (FAST)
+    for file, label in train_dataset.index:
         train_labels.append(label)
         binary_labels.append(0 if label == 0 else 1)
 
@@ -119,10 +127,23 @@ def get_loaders(train_dir, val_dir, batch_size=32):
     global binary_class_weight
     binary_class_weight = torch.tensor([binary_class_weight_value])
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, num_workers=4, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
     return train_loader, val_loader
+
+def setup_cache_and_index():
+    for split in ['train', 'val']:
+        if not os.path.exists(os.path.join(cache_root, split)):
+            create_cache(split)
+        else:
+            print(f"✅ Cache for {split} already exists. Skipping...")
+
+        index_path = os.path.join(cache_root, split, 'file_index.pt')
+        if not os.path.exists(index_path):
+            create_file_index(os.path.join(cache_root, split))
+        else:
+            print(f"✅ File index for {split} already exists. Skipping...")
 
 # --- Model Builder ---
 class DualClassifier(nn.Module):
@@ -182,15 +203,20 @@ class DualClassifier(nn.Module):
 
 from sklearn.metrics import accuracy_score
 
-def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model', alpha=1.0, beta=2.0, binary_threshold=0.3):
+import time
+from tqdm import tqdm
+
+import time
+import time
+
+def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model', alpha=1.0, beta=3.0, binary_threshold=0.7):
     model = model.to(device)
 
-    # Freeze all backbone layers initially
     for param in model.backbone.parameters():
         param.requires_grad = False
 
     criterion_binary = nn.BCEWithLogitsLoss(pos_weight=binary_class_weight.to(device))
-    criterion_multi = nn.CrossEntropyLoss(weight=multi_class_weights.to(device))
+    criterion_multi = nn.CrossEntropyLoss(weight=multi_class_weights.to(device), reduction='none')
 
     optimizer = torch.optim.Adam([
         {'params': model.backbone.parameters(), 'lr': 1e-5},
@@ -206,40 +232,35 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     train_losses, val_losses = [], []
     fine_tuning = False
 
+    total_start_time = time.time()
+
     for epoch in range(num_epochs):
-        print(f"\nEpoch {epoch + 1}/{num_epochs}")
+        print(f"\n{'=' * 50}")
+        print(f"Epoch {epoch + 1}/{num_epochs}")
+        print(f"{'=' * 50}")
+
+        epoch_start_time = time.time()
         model.train()
         running_train_loss = 0
 
-        train_pbar = tqdm(train_loader, desc=f'Epoch {epoch + 1} Training', ncols=150, mininterval=0.5, leave=False)
-
-        for inputs, binary_targets, multi_targets in train_pbar:
+        for inputs, binary_targets, multi_targets in train_loader:
             inputs, binary_targets, multi_targets = inputs.to(device), binary_targets.to(device).float(), multi_targets.to(device)
 
             optimizer.zero_grad()
             binary_logits, multi_logits = model(inputs)
 
             loss_binary = criterion_binary(binary_logits.squeeze(), binary_targets)
+
+            # --- Down-weight Nevi Samples in Multi-Class Loss ---
+            sample_weights = torch.where(multi_targets == 0, 0.1, 1.0).to(device)
             loss_multi = criterion_multi(multi_logits, multi_targets)
+            loss_multi = (loss_multi * sample_weights).mean()
 
             loss = alpha * loss_binary + beta * loss_multi
             loss.backward()
             optimizer.step()
 
             running_train_loss += loss.item()
-
-            binary_probs = torch.sigmoid(binary_logits).detach().cpu().numpy()
-            binary_preds_batch = (binary_probs > binary_threshold).astype(int)
-            multi_preds_batch = torch.argmax(multi_logits, dim=1).detach().cpu().numpy()
-
-            binary_acc = accuracy_score(binary_targets.cpu().numpy(), binary_preds_batch)
-            multi_acc = accuracy_score(multi_targets.cpu().numpy(), multi_preds_batch)
-
-            train_pbar.set_postfix({
-                'Loss': f'{loss.item():.4f}',
-                'Binary Acc': f'{binary_acc:.4f}',
-                'Multi Acc': f'{multi_acc:.4f}'
-            })
 
         avg_train_loss = running_train_loss / len(train_loader)
         train_losses.append(avg_train_loss)
@@ -252,15 +273,16 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         val_multi_labels, val_multi_preds = [], []
         combined_preds = []
 
-        val_pbar = tqdm(val_loader, desc=f'Epoch {epoch + 1} Validation', ncols=150, mininterval=0.5, leave=False)
         with torch.no_grad():
-            for inputs, binary_targets, multi_targets in val_pbar:
+            for inputs, binary_targets, multi_targets in val_loader:
                 inputs, binary_targets, multi_targets = inputs.to(device), binary_targets.to(device).float(), multi_targets.to(device)
 
                 binary_logits, multi_logits = model(inputs)
 
                 loss_binary = criterion_binary(binary_logits.squeeze(), binary_targets)
                 loss_multi = criterion_multi(multi_logits, multi_targets)
+                loss_multi = loss_multi.mean()  # ✅ Required: mean in validation
+
                 loss = alpha * loss_binary + beta * loss_multi
 
                 running_val_loss += loss.item()
@@ -274,10 +296,9 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
                 val_multi_labels.extend(multi_targets.cpu().numpy())
                 val_multi_preds.extend(multi_preds_batch)
 
-                # Combined Decision
                 for bin_prob, multi_pred in zip(binary_probs, multi_preds_batch):
                     if bin_prob > binary_threshold:
-                        combined_preds.append(0)  # Predict nevus
+                        combined_preds.append(0)
                     else:
                         combined_preds.append(multi_pred)
 
@@ -287,28 +308,36 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
 
         val_binary_preds_bin = (np.array(val_binary_preds) > binary_threshold).astype(int)
 
-        # Binary Metrics
+        # --- Metrics ---
         binary_precision = precision_score(val_binary_labels, val_binary_preds_bin, zero_division=0)
         binary_recall = recall_score(val_binary_labels, val_binary_preds_bin, zero_division=0)
         binary_f1 = f1_score(val_binary_labels, val_binary_preds_bin, zero_division=0)
         binary_auc = roc_auc_score(val_binary_labels, val_binary_preds)
 
-        # Multi-Class Metrics
         multi_acc = accuracy_score(val_multi_labels, val_multi_preds)
         multi_precision = precision_score(val_multi_labels, val_multi_preds, average='macro', zero_division=0)
         multi_recall = recall_score(val_multi_labels, val_multi_preds, average='macro', zero_division=0)
         multi_f1 = f1_score(val_multi_labels, val_multi_preds, average='macro', zero_division=0)
 
-        # Combined Metrics
         combined_acc = accuracy_score(val_multi_labels, combined_preds)
         combined_precision = precision_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
         combined_recall = recall_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
         combined_f1 = f1_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
 
+        epoch_end_time = time.time()
+        epoch_duration = epoch_end_time - epoch_start_time
+        elapsed_total_time = epoch_end_time - total_start_time
+        estimated_total_time = (elapsed_total_time / (epoch + 1)) * num_epochs
+        estimated_remaining_time = estimated_total_time - elapsed_total_time
+
+        print(f"\nEpoch {epoch + 1} Summary")
         print(f"Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         print(f"Binary -> Precision: {binary_precision:.4f} | Recall: {binary_recall:.4f} | F1: {binary_f1:.4f} | AUC: {binary_auc:.4f}")
         print(f"Multi   -> Acc: {multi_acc:.4f} | Precision: {multi_precision:.4f} | Recall: {multi_recall:.4f} | F1: {multi_f1:.4f}")
         print(f"Combined -> Acc: {combined_acc:.4f} | Precision: {combined_precision:.4f} | Recall: {combined_recall:.4f} | F1: {combined_f1:.4f}")
+        print(f"🕒 Epoch duration: {epoch_duration:.2f} seconds")
+        print(f"🕒 Estimated remaining time: {estimated_remaining_time / 60:.2f} minutes")
+        print(f"{'=' * 50}")
 
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
@@ -368,27 +397,27 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     plt.legend()
     plt.show()
 
+if __name__ == "__main__":
+    setup_cache_and_index()  # <-- Run cache check only once
 
-# --- Run Pipeline ---
-train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
+    train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
 
-for backbone_name in ['mobilenet', 'resnet', 'efficientnet']:
-    print(f"\n🚀 Starting training for {backbone_name} backbone...")
+    for backbone_name in ['efficientnet','mobilenet', 'resnet']:
+        print(f"\n🚀 Starting training for {backbone_name} backbone...")
 
-    if backbone_name == 'mobilenet':
-        print("📥 Downloading MobileNetV2...")
-        backbone = models.mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
-    elif backbone_name == 'resnet':
-        print("📥 Downloading ResNet50...")
-        backbone = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
-    elif backbone_name == 'efficientnet':
-        print("📥 Downloading EfficientNet B0...")
-        backbone = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
+        if backbone_name == 'mobilenet':
+            print("📥 Downloading MobileNetV2...")
+            backbone = models.mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
+        elif backbone_name == 'resnet':
+            print("📥 Downloading ResNet50...")
+            backbone = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+        elif backbone_name == 'efficientnet':
+            print("📥 Downloading EfficientNet B0...")
+            backbone = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
 
-    model = DualClassifier(backbone)
-    # Freeze all backbone layers initially
-    for param in model.backbone.parameters():
-        param.requires_grad = False
+        model = DualClassifier(backbone)
 
-    train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name=backbone_name)
+        for param in model.backbone.parameters():
+            param.requires_grad = False
 
+        train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name=backbone_name)
