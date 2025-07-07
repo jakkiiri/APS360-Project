@@ -182,7 +182,7 @@ class DualClassifier(nn.Module):
 
 from sklearn.metrics import accuracy_score
 
-def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model'):
+def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model', alpha=1.0, beta=2.0, binary_threshold=0.3):
     model = model.to(device)
 
     # Freeze all backbone layers initially
@@ -210,10 +210,9 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         print(f"\nEpoch {epoch + 1}/{num_epochs}")
         model.train()
         running_train_loss = 0
-        train_binary_labels, train_binary_preds = [], []
-        train_multi_labels, train_multi_preds = [], []
 
-        train_pbar = tqdm(train_loader, desc=f'Epoch {epoch + 1} Training', ncols=150)
+        train_pbar = tqdm(train_loader, desc=f'Epoch {epoch + 1} Training', ncols=150, mininterval=0.5, leave=False)
+
         for inputs, binary_targets, multi_targets in train_pbar:
             inputs, binary_targets, multi_targets = inputs.to(device), binary_targets.to(device).float(), multi_targets.to(device)
 
@@ -222,23 +221,17 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
 
             loss_binary = criterion_binary(binary_logits.squeeze(), binary_targets)
             loss_multi = criterion_multi(multi_logits, multi_targets)
-            loss = loss_binary + loss_multi
+
+            loss = alpha * loss_binary + beta * loss_multi
             loss.backward()
             optimizer.step()
 
             running_train_loss += loss.item()
 
             binary_probs = torch.sigmoid(binary_logits).detach().cpu().numpy()
-            binary_preds_batch = (binary_probs > 0.3).astype(int)
-
-            train_binary_labels.extend(binary_targets.cpu().numpy())
-            train_binary_preds.extend(binary_preds_batch)
-
+            binary_preds_batch = (binary_probs > binary_threshold).astype(int)
             multi_preds_batch = torch.argmax(multi_logits, dim=1).detach().cpu().numpy()
-            train_multi_labels.extend(multi_targets.cpu().numpy())
-            train_multi_preds.extend(multi_preds_batch)
 
-            # Batch Metrics
             binary_acc = accuracy_score(binary_targets.cpu().numpy(), binary_preds_batch)
             multi_acc = accuracy_score(multi_targets.cpu().numpy(), multi_preds_batch)
 
@@ -254,10 +247,12 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         # --- Validation Loop ---
         model.eval()
         running_val_loss = 0
+
         val_binary_labels, val_binary_preds = [], []
         val_multi_labels, val_multi_preds = [], []
+        combined_preds = []
 
-        val_pbar = tqdm(val_loader, desc=f'Epoch {epoch + 1} Validation', ncols=150)
+        val_pbar = tqdm(val_loader, desc=f'Epoch {epoch + 1} Validation', ncols=150, mininterval=0.5, leave=False)
         with torch.no_grad():
             for inputs, binary_targets, multi_targets in val_pbar:
                 inputs, binary_targets, multi_targets = inputs.to(device), binary_targets.to(device).float(), multi_targets.to(device)
@@ -266,25 +261,31 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
 
                 loss_binary = criterion_binary(binary_logits.squeeze(), binary_targets)
                 loss_multi = criterion_multi(multi_logits, multi_targets)
-                loss = loss_binary + loss_multi
+                loss = alpha * loss_binary + beta * loss_multi
 
                 running_val_loss += loss.item()
 
                 binary_probs = torch.sigmoid(binary_logits).cpu().numpy()
-                binary_preds_batch = (binary_probs > 0.3).astype(int)
+                binary_preds_batch = (binary_probs > binary_threshold).astype(int)
+                multi_preds_batch = torch.argmax(multi_logits, dim=1).cpu().numpy()
+
                 val_binary_labels.extend(binary_targets.cpu().numpy())
                 val_binary_preds.extend(binary_probs)
-
-                multi_preds_batch = torch.argmax(multi_logits, dim=1).cpu().numpy()
                 val_multi_labels.extend(multi_targets.cpu().numpy())
                 val_multi_preds.extend(multi_preds_batch)
+
+                # Combined Decision
+                for bin_prob, multi_pred in zip(binary_probs, multi_preds_batch):
+                    if bin_prob > binary_threshold:
+                        combined_preds.append(0)  # Predict nevus
+                    else:
+                        combined_preds.append(multi_pred)
 
         avg_val_loss = running_val_loss / len(val_loader)
         val_losses.append(avg_val_loss)
         scheduler.step(avg_val_loss)
 
-        # --- Metrics Calculation ---
-        val_binary_preds_bin = (np.array(val_binary_preds) > 0.3).astype(int)
+        val_binary_preds_bin = (np.array(val_binary_preds) > binary_threshold).astype(int)
 
         # Binary Metrics
         binary_precision = precision_score(val_binary_labels, val_binary_preds_bin, zero_division=0)
@@ -298,11 +299,16 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         multi_recall = recall_score(val_multi_labels, val_multi_preds, average='macro', zero_division=0)
         multi_f1 = f1_score(val_multi_labels, val_multi_preds, average='macro', zero_division=0)
 
+        # Combined Metrics
+        combined_acc = accuracy_score(val_multi_labels, combined_preds)
+        combined_precision = precision_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
+        combined_recall = recall_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
+        combined_f1 = f1_score(val_multi_labels, combined_preds, average='macro', zero_division=0)
+
         print(f"Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         print(f"Binary -> Precision: {binary_precision:.4f} | Recall: {binary_recall:.4f} | F1: {binary_f1:.4f} | AUC: {binary_auc:.4f}")
         print(f"Multi   -> Acc: {multi_acc:.4f} | Precision: {multi_precision:.4f} | Recall: {multi_recall:.4f} | F1: {multi_f1:.4f}")
-
-        torch.cuda.empty_cache()
+        print(f"Combined -> Acc: {combined_acc:.4f} | Precision: {combined_precision:.4f} | Recall: {combined_recall:.4f} | F1: {combined_f1:.4f}")
 
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
@@ -313,7 +319,6 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
             if patience_counter >= patience and not fine_tuning:
                 print("Early stopping triggered. Starting fine-tuning...")
 
-                # Unfreeze last layers for fine-tuning
                 for name, param in model.backbone.named_parameters():
                     if isinstance(model.backbone, models.ResNet) and ('layer4' in name or 'fc' in name):
                         param.requires_grad = True
@@ -339,6 +344,8 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
                 print("Early stopping triggered after fine-tuning.")
                 break
 
+        torch.cuda.empty_cache()
+
     # --- Final Confusion Matrices ---
     ConfusionMatrixDisplay(confusion_matrix(val_binary_labels, val_binary_preds_bin)).plot()
     plt.title(f'{backbone_name} Binary Classifier Confusion Matrix')
@@ -346,6 +353,10 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
 
     ConfusionMatrixDisplay(confusion_matrix(val_multi_labels, val_multi_preds)).plot()
     plt.title(f'{backbone_name} Multi-Class Classifier Confusion Matrix')
+    plt.show()
+
+    ConfusionMatrixDisplay(confusion_matrix(val_multi_labels, combined_preds)).plot()
+    plt.title(f'{backbone_name} Combined Model Confusion Matrix')
     plt.show()
 
     plt.figure(figsize=(10, 5))
@@ -356,6 +367,7 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     plt.title(f'{backbone_name} Training Curve')
     plt.legend()
     plt.show()
+
 
 # --- Run Pipeline ---
 train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
