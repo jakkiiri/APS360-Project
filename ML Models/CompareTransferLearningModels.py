@@ -59,6 +59,9 @@ def extract_embeddings(model, dataloader, model_type='mobilenet'):
                 features = x
             elif model_type == 'efficientnet':
                 features = model.features(inputs)
+            elif model_type == 'densenet121' or model_type == 'densenet169':
+                features = model.features(inputs)
+
 
             pooled = F.adaptive_avg_pool2d(features, (1, 1))
             embedding = pooled.view(pooled.size(0), -1)
@@ -79,6 +82,11 @@ def process_pretrained_model(model_type, title, dataloader):
         model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
     elif model_type == 'efficientnet':
         model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
+    elif model_type == 'densenet121':
+        model = models.densenet121(pretrained=True)
+    elif model_type == 'densenet169':
+        emodel = models.densenet169(pretrained=True)
+
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
@@ -97,7 +105,8 @@ if __name__ == "__main__":
 
     # ✅ Use num_workers=0 for full Windows stability
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
-
+    process_pretrained_model('densenet121', 't-SNE: DenseNet121 (Pretrained)', val_loader)
+    process_pretrained_model('densenet169', 't-SNE: DenseNet169 (Pretrained)', val_loader)
     process_pretrained_model('mobilenet', 't-SNE: MobileNetV2 (Pretrained)', val_loader)
     process_pretrained_model('resnet', 't-SNE: ResNet50 (Pretrained)', val_loader)
     process_pretrained_model('efficientnet', 't-SNE: EfficientNet-B0 (Pretrained)', val_loader)

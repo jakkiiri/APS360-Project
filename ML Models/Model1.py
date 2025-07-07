@@ -91,7 +91,7 @@ class CachedDataset(Dataset):
         return image, binary_label, label
 
 # --- Data Loader with Class Weights ---
-def get_loaders(train_dir, val_dir, batch_size=8):
+def get_loaders(train_dir, val_dir, batch_size=32):
     train_dataset = CachedDataset(train_dir)
     val_dataset = CachedDataset(val_dir)
 
@@ -185,6 +185,10 @@ from sklearn.metrics import accuracy_score
 def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model'):
     model = model.to(device)
 
+    # Freeze all backbone layers initially
+    for param in model.backbone.parameters():
+        param.requires_grad = False
+
     criterion_binary = nn.BCEWithLogitsLoss(pos_weight=binary_class_weight.to(device))
     criterion_multi = nn.CrossEntropyLoss(weight=multi_class_weights.to(device))
 
@@ -200,6 +204,7 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     patience_counter = 0
 
     train_losses, val_losses = [], []
+    fine_tuning = False
 
     for epoch in range(num_epochs):
         print(f"\nEpoch {epoch + 1}/{num_epochs}")
@@ -305,8 +310,33 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
             torch.save(model.state_dict(), f'{backbone_name}_best_model.pth')
         else:
             patience_counter += 1
-            if patience_counter >= patience:
-                print("Early stopping triggered.")
+            if patience_counter >= patience and not fine_tuning:
+                print("Early stopping triggered. Starting fine-tuning...")
+
+                # Unfreeze last layers for fine-tuning
+                for name, param in model.backbone.named_parameters():
+                    if isinstance(model.backbone, models.ResNet) and ('layer4' in name or 'fc' in name):
+                        param.requires_grad = True
+                    elif isinstance(model.backbone, models.MobileNetV2) and ('18' in name):
+                        param.requires_grad = True
+                    elif isinstance(model.backbone, models.EfficientNet) and ('blocks.6' in name or 'classifier' in name):
+                        param.requires_grad = True
+
+                optimizer = torch.optim.Adam([
+                    {'params': model.backbone.parameters(), 'lr': 1e-6},
+                    {'params': model.binary_classifier.parameters(), 'lr': 1e-4},
+                    {'params': model.multi_classifier.parameters(), 'lr': 1e-4}
+                ])
+
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=patience, factor=0.5, verbose=True)
+
+                patience_counter = 0
+                fine_tuning = True
+                print("Fine-tuning optimizer configured. Resuming training.")
+                continue
+
+            elif patience_counter >= patience and fine_tuning:
+                print("Early stopping triggered after fine-tuning.")
                 break
 
     # --- Final Confusion Matrices ---
@@ -327,7 +357,6 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     plt.legend()
     plt.show()
 
-
 # --- Run Pipeline ---
 train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
 
@@ -345,5 +374,9 @@ for backbone_name in ['mobilenet', 'resnet', 'efficientnet']:
         backbone = models.efficientnet_b0(weights=EfficientNet_B0_Weights.IMAGENET1K_V1)
 
     model = DualClassifier(backbone)
+    # Freeze all backbone layers initially
+    for param in model.backbone.parameters():
+        param.requires_grad = False
+
     train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name=backbone_name)
 
