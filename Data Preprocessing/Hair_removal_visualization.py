@@ -8,7 +8,7 @@ import os
 dataset_path = r'C:\Users\shore\Desktop\APS360\Datasets\Combined'
 csv_path = os.path.join(dataset_path, 'combined_labels.csv')
 df = pd.read_csv(csv_path)
-img_path = os.path.join('C:\\Users\\shore\\Desktop\\APS360\\Data Preprocessing', '0.5m-melanoma-arm-blue-2.webp')
+img_path = "C:\\Users\\shore\\Desktop\\APS360\\APS360-Project\\Data Preprocessing\\Hair Removal Images\\ik81gqr5n9l31.jpg"
 
 # Select one image per category
 sample_images = df.groupby('label').first().reset_index()
