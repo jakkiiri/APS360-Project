@@ -177,14 +177,7 @@ Approximately 1,000 images labeled as scars or left unlabeled were grouped under
 
 \subsubsection{Dataset Statistics}
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=0.8\textwidth]{Figs/class_distribution.png}
-\end{center}
-\caption{Class distribution of combined dataset, imbalanced with nevus as the majority class.}
-\end{figure}
-
-\begin{table}[h]
+\begin{table}[H]
 \caption{Class counts after preprocessing}
 \label{class-counts}
 \begin{center}
@@ -203,18 +196,28 @@ Approximately 1,000 images labeled as scars or left unlabeled were grouped under
 \end{center}
 \end{table}
 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Figs/class_distribution.png}
+\end{center}
+\caption{Bar chart visualization of the data in Table~\ref{class-counts}. Class imbalance with nevus as the majority class is immediately apparent.}
+\end{figure}
+
+
+We split the processed dataset into 70\% training, 15\% validation, and 15\% test sets to ensure robust model training and evaluation. Each split maintains the same class distribution as visualized in Figure~\ref{fig:dataset_split_distribution}. However, the dataset remains significantly imbalanced, with the \textit{nevus} class accounting for approximately 42.5\% of all samples.
+
+In the future, if the class imbalance remains an issue, we may add more samples of underrepresented classes using datasets like DERM12345 and reputable dermatological image sources like DermNet.
+
+We created class distribution visualizations using matplotlib to identify label imbalances. These bar charts allow us to verify data quality and plan appropriate sampling and augmentation strategies for training.
+
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{Figs/dataset_split_distribution.png}
 \end{center}
 \caption{Even class distribution between training, validation, and testing datasets.}
+\label{fig:dataset_split_distribution}
 \end{figure}
-
-We split the processed dataset into 70\% training, 15\% validation, and 15\% test sets to ensure robust model training and evaluation. Each split maintains the same class distribution as visualized in the dataset summary above. However, the dataset remains significantly imbalanced, with the \textit{nevus} class accounting for approximately 42.5\% of all samples.
-
-In the future, if the class imbalance remains an issue, we may add more samples of underrepresented classes using datasets like DERM12345 and reputable dermatological image sources like DermNet.
-
-We created class distribution visualizations using matplotlib to identify label imbalances. These bar charts allow us to verify data quality and plan appropriate sampling and augmentation strategies for training.
 
 \subsubsection{Challenges}
 
