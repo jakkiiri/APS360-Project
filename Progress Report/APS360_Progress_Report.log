@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.1.20)  10 JUL 2025 19:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.1.20)  10 JUL 2025 20:23
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -314,75 +314,82 @@ Package: array 2024/10/17 v2.6g Tabular extension package (FMi)
 \TX@delta=\dimen179
 \TX@cols=\count300
 \TX@ftn=\toks24
+) (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count301
+\float@exts=\toks25
+\float@box=\box56
+\@float@everytoks=\toks26
+\@floatcapt=\box57
 )
-LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 48.
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 49.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 ) (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count301
-\l__pdf_internal_box=\box56
+\l__color_backend_stack_int=\count302
+\l__pdf_internal_box=\box58
 ) (APS360_Progress_Report.aux)
 \openout1 = `APS360_Progress_Report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count302
+\scratchcounter=\count303
 \scratchdimen=\dimen180
-\scratchbox=\box57
-\nofMPsegments=\count303
-\nofMParguments=\count304
-\everyMPshowfont=\toks25
-\MPscratchCnt=\count305
+\scratchbox=\box59
+\nofMPsegments=\count304
+\nofMParguments=\count305
+\everyMPshowfont=\toks27
+\MPscratchCnt=\count306
 \MPscratchDim=\dimen181
-\MPnumerator=\count306
-\makeMPintoPDFobject=\count307
-\everyMPtoPDFconversion=\toks26
+\MPnumerator=\count307
+\makeMPintoPDFobject=\count308
+\everyMPtoPDFconversion=\toks28
 ) (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 48.
+Package hyperref Info: Link coloring OFF on input line 49.
  (APS360_Progress_Report.out) (APS360_Progress_Report.out)
 \@outlinefile=\write3
 \openout3 = `APS360_Progress_Report.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 51.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 52.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 51.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 52.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 51.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 52.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 <Figs/melanoma_incidence_mortality.png, id=56, 1204.5pt x 559.08875pt>
 File: Figs/melanoma_incidence_mortality.png Graphic file (type png)
 <use Figs/melanoma_incidence_mortality.png>
-Package pdftex.def Info: Figs/melanoma_incidence_mortality.png  used on input line 68.
+Package pdftex.def Info: Figs/melanoma_incidence_mortality.png  used on input line 69.
 (pdftex.def)             Requested size: 218.61795pt x 101.4762pt.
 
 Underfull \vbox (badness 1354) has occurred while \output is active []
@@ -391,139 +398,194 @@ Underfull \vbox (badness 1354) has occurred while \output is active []
 
 [1{C:/Users/Jordan/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
- <./Figs/melanoma_incidence_mortality.png (PNG copy)>]
+
+pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.75 
+      <./Figs/melanoma_incidence_mortality.png (PNG copy)>]
 <Figs/system_visualization.png, id=76, 2006.49625pt x 532.99126pt>
 File: Figs/system_visualization.png Graphic file (type png)
 <use Figs/system_visualization.png>
-Package pdftex.def Info: Figs/system_visualization.png  used on input line 79.
+Package pdftex.def Info: Figs/system_visualization.png  used on input line 80.
 (pdftex.def)             Requested size: 278.23827pt x 73.90257pt.
-<Figs/system_usage_concept.png, id=78, 770.88pt x 660.21657pt>
-File: Figs/system_usage_concept.png Graphic file (type png)
-<use Figs/system_usage_concept.png>
-Package pdftex.def Info: Figs/system_usage_concept.png  used on input line 88.
-(pdftex.def)             Requested size: 158.99156pt x 136.16127pt.
-
-Underfull \vbox (badness 7685) has occurred while \output is active []
-
-
-
-[2 <./Figs/system_visualization.png> <./Figs/system_usage_concept.png>]
-<Figs/google_sheet_tracking.png, id=87, 1129.97156pt x 441.14813pt>
-File: Figs/google_sheet_tracking.png Graphic file (type png)
-<use Figs/google_sheet_tracking.png>
-Package pdftex.def Info: Figs/google_sheet_tracking.png  used on input line 101.
-(pdftex.def)             Requested size: 397.48499pt x 155.17825pt.
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 109.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 95.
  (C:\Users\Jordan\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 
-[3 <./Figs/google_sheet_tracking.png>]
-<Figs/sample_class_images.png, id=100, 1042.1334pt x 567.3195pt>
+[2
+pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.99 \end{itemize}
+                   <./Figs/system_visualization.png>]
+<Figs/google_sheet_tracking.png, id=84, 1129.97156pt x 441.14813pt>
+File: Figs/google_sheet_tracking.png Graphic file (type png)
+<use Figs/google_sheet_tracking.png>
+Package pdftex.def Info: Figs/google_sheet_tracking.png  used on input line 129.
+(pdftex.def)             Requested size: 317.9892pt x 124.13991pt.
+
+
+[3
+pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.146 \item T
+             he HAM10000 dataset contains 10,015 dermatoscopic images from 7... <./Figs/google_sheet_tracking.png>]
+<Figs/sample_class_images.png, id=97, 1042.1334pt x 567.3195pt>
 File: Figs/sample_class_images.png Graphic file (type png)
 <use Figs/sample_class_images.png>
-Package pdftex.def Info: Figs/sample_class_images.png  used on input line 170.
-(pdftex.def)             Requested size: 198.7425pt x 108.19002pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<Figs/hair_removal_filter.png, id=103, 1447.4075pt x 501.875pt>
+Package pdftex.def Info: Figs/sample_class_images.png  used on input line 160.
+(pdftex.def)             Requested size: 238.49341pt x 129.8315pt.
+<Figs/hair_removal_filter.png, id=100, 1447.4075pt x 501.875pt>
 File: Figs/hair_removal_filter.png Graphic file (type png)
 <use Figs/hair_removal_filter.png>
-Package pdftex.def Info: Figs/hair_removal_filter.png  used on input line 183.
-(pdftex.def)             Requested size: 198.7425pt x 68.90656pt.
+Package pdftex.def Info: Figs/hair_removal_filter.png  used on input line 173.
+(pdftex.def)             Requested size: 238.49341pt x 82.69092pt.
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<Figs/class_distribution.png, id=104, 1003.75pt x 501.875pt>
+<Figs/class_distribution.png, id=101, 1003.75pt x 501.875pt>
 File: Figs/class_distribution.png Graphic file (type png)
 <use Figs/class_distribution.png>
-Package pdftex.def Info: Figs/class_distribution.png  used on input line 192.
+Package pdftex.def Info: Figs/class_distribution.png  used on input line 182.
 (pdftex.def)             Requested size: 317.9892pt x 158.9951pt.
 
 
-[4]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<Figs/dataset_split_distribution.png, id=115, 1040.688pt x 572.3784pt>
+[4
+pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.186 
+       <./Figs/sample_class_images.png>]
+<Figs/dataset_split_distribution.png, id=114, 1040.688pt x 492.1587pt>
 File: Figs/dataset_split_distribution.png Graphic file (type png)
 <use Figs/dataset_split_distribution.png>
-Package pdftex.def Info: Figs/dataset_split_distribution.png  used on input line 220.
-(pdftex.def)             Requested size: 317.9892pt x 174.89394pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
+Package pdftex.def Info: Figs/dataset_split_distribution.png  used on input line 208.
+(pdftex.def)             Requested size: 278.23827pt x 131.58543pt.
 
 
-Underfull \vbox (badness 1629) has occurred while \output is active []
-
-
-
-[5 <./Figs/sample_class_images.png> <./Figs/hair_removal_filter.png (PNG copy)> <./Figs/class_distribution.png (PNG copy)>]
-
-[6 <./Figs/dataset_split_distribution.png>]
-<Figs/baseline_performance.png, id=131, 515.67656pt x 344.03531pt>
+[5
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.214 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.214 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.214 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.214 
+       <./Figs/hair_removal_filter.png (PNG copy)> <./Figs/class_distribution.png (PNG copy)> <./Figs/dataset_split_distribution.png>]
+<Figs/baseline_performance.png, id=124, 515.67656pt x 344.03531pt>
 File: Figs/baseline_performance.png Graphic file (type png)
 <use Figs/baseline_performance.png>
-Package pdftex.def Info: Figs/baseline_performance.png  used on input line 251.
+Package pdftex.def Info: Figs/baseline_performance.png  used on input line 237.
 (pdftex.def)             Requested size: 238.49341pt x 159.10858pt.
-<Figs/model_architecture.png, id=132, 2006.49625pt x 972.63374pt>
+
+
+[6
+pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.244 
+       <./Figs/baseline_performance.png>]
+<Figs/model_architecture.png, id=131, 2006.49625pt x 972.63374pt>
 File: Figs/model_architecture.png Graphic file (type png)
 <use Figs/model_architecture.png>
-Package pdftex.def Info: Figs/model_architecture.png  used on input line 262.
+Package pdftex.def Info: Figs/model_architecture.png  used on input line 252.
 (pdftex.def)             Requested size: 278.23827pt x 134.86177pt.
 
-Overfull \hbox (7.34973pt too wide) in paragraph at lines 298--298
+Overfull \hbox (7.34973pt too wide) in paragraph at lines 288--288
 []|\OT1/ptm/m/n/9 WeightedRandomSampler| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 298--298
+Underfull \hbox (badness 10000) in paragraph at lines 288--288
 []|\OT1/ptm/m/n/9 ReduceLROnPlateau
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 298--298
+Underfull \hbox (badness 10000) in paragraph at lines 288--288
 []|\OT1/ptm/m/n/9 CrossEntropyLoss
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<Figs/confusion_matrix.png, id=133, 1040.688pt x 572.3784pt>
+<Figs/confusion_matrix.png, id=132, 1040.688pt x 572.3784pt>
 File: Figs/confusion_matrix.png Graphic file (type png)
 <use Figs/confusion_matrix.png>
-Package pdftex.def Info: Figs/confusion_matrix.png  used on input line 304.
-(pdftex.def)             Requested size: 278.23827pt x 153.03328pt.
+Package pdftex.def Info: Figs/confusion_matrix.png  used on input line 294.
+(pdftex.def)             Requested size: 397.48499pt x 218.61523pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<Figs/training_validation_loss.png, id=134, 722.7pt x 433.62pt>
+<Figs/training_validation_loss.png, id=133, 722.7pt x 433.62pt>
 File: Figs/training_validation_loss.png Graphic file (type png)
 <use Figs/training_validation_loss.png>
-Package pdftex.def Info: Figs/training_validation_loss.png  used on input line 311.
-(pdftex.def)             Requested size: 198.7425pt x 119.24255pt.
+Package pdftex.def Info: Figs/training_validation_loss.png  used on input line 301.
+(pdftex.def)             Requested size: 278.23827pt x 166.9409pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-
-
-[7 <./Figs/baseline_performance.png> <./Figs/model_architecture.png>]
-<Figs/validation_metrics.png, id=144, 1040.688pt x 572.3784pt>
+<Figs/validation_metrics.png, id=134, 1040.688pt x 572.3784pt>
 File: Figs/validation_metrics.png Graphic file (type png)
 <use Figs/validation_metrics.png>
-Package pdftex.def Info: Figs/validation_metrics.png  used on input line 320.
-(pdftex.def)             Requested size: 278.23827pt x 153.03328pt.
-
+Package pdftex.def Info: Figs/validation_metrics.png  used on input line 310.
+(pdftex.def)             Requested size: 317.9892pt x 174.89394pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[8 <./Figs/confusion_matrix.png>] (APS360_Progress_Report.bbl
+[7
+pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.322 
+       <./Figs/model_architecture.png>]
+Underfull \vbox (badness 7030) has occurred while \output is active []
 
-[9 <./Figs/training_validation_loss.png> <./Figs/validation_metrics.png>])
+
+
+[8
+pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.326 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.326 
+       <./Figs/confusion_matrix.png>] (APS360_Progress_Report.bbl
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[9
+pdfTeX warning (ext4): destination with the same identifier (name{figure.11}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.14 
+     
+pdfTeX warning (ext4): destination with the same identifier (name{figure.12}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.14 
+      <./Figs/training_validation_loss.png> <./Figs/validation_metrics.png>])
 
 [10] (APS360_Progress_Report.aux)
  ***********
@@ -534,17 +596,17 @@ Package rerunfilecheck Info: File `APS360_Progress_Report.out' has not changed.
 (rerunfilecheck)             Checksum: 523404EDC3C0409969EF98D937A77A04;2038.
  ) 
 Here is how much of TeX's memory you used:
- 11487 strings out of 473536
- 174822 string characters out of 5714472
- 586974 words of memory out of 5000000
- 34471 multiletter control sequences out of 15000+600000
+ 11549 strings out of 473536
+ 175673 string characters out of 5714472
+ 590371 words of memory out of 5000000
+ 34530 multiletter control sequences out of 15000+600000
  586383 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,1061b,501s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,1061b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on APS360_Progress_Report.pdf (10 pages, 6078635 bytes).
+Output written on APS360_Progress_Report.pdf (10 pages, 3991954 bytes).
 PDF statistics:
- 215 PDF objects out of 1000 (max. 8388607)
- 47 named destinations out of 1000 (max. 500000)
- 162 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 212 PDF objects out of 1000 (max. 8388607)
+ 46 named destinations out of 1000 (max. 500000)
+ 157 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -17,6 +17,7 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{float}
 
 %######## APS360: Put your project Title here
 \title{Skin Disease Detection Progres Report}
@@ -83,26 +84,11 @@ The goal of our project is to create an automated skin disease detection system 
 
 Deep learning models, particularly convolutional neural networks (CNNs), are the most appropriate approach for this image classification task. CNNs use trainable filters to extract high-level spatial patterns in images. The use of shared weights also increases the computational efficiency of CNNs compared to fully connected alternatives. Since skin disease detection requires processing large amounts of image data, learning complex visual patterns where subtle differences can affect diagnosis, and using datasets with expert-labelled diseases, using a CNN model trained via supervised learning would yield the most effective classifier.
 
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width=0.4\textwidth]{Figs/system_usage_concept.png}
-\end{center}
-\caption{AI-generated image of how we envision the system to be used.}
-\end{figure}
-
 Lastly, we find this project interesting because it lies at the intersection of biomedical and machine learning engineering, two fields we are both passionate about and hope to explore further. Once completed, we plan to deploy the system as a publicly accessible web application. This will allow medical professionals to test the prototype in real-world settings and provide feedback, while also offering individuals without a diagnosis a chance to perform an initial screening of their skin condition. By making the tool accessible, we hope to raise awareness about early detection, improve access to preliminary assessment, and ultimately contribute to better health outcomes through the responsible use of AI in healthcare.
 
 \section{Individual Contributions and Responsibilities}
 
 Our team collaborates through GitHub for code management, Discord for daily communication, and a shared Google Sheet to track tasks and deadlines. We hold regular meetings to review progress and assign new responsibilities, while maintaining continuous communication via Discord. Although tasks are assigned to specific individuals, team members frequently assist one another. This approach helps ensure timely completion and provides redundancy in case someone faces unforeseen challenges. The individual contributions and task assignments listed below reflect those on our Google Sheet; however, in practice, our work is highly collaborative and often overlaps beyond these formal assignments.
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width=1.0\textwidth]{Figs/google_sheet_tracking.png}
-\end{center}
-\caption{An image of the Google Sheet we used to track, assign, and efficiently take on tasks.}
-\end{figure}
-
 
 \textbf{Jacky Li}
 \begin{itemize}
@@ -129,8 +115,6 @@ Our team collaborates through GitHub for code management, Discord for daily comm
 \item Next steps: Finalize model training scripts; update evaluation metrics; help compile results and figures for the final report.
 \end{itemize}
 
-\pagebreak
-
 \textbf{Lawrence Ding}
 \begin{itemize}
 \item Researched typical baseline models used for medical imaging.
@@ -140,6 +124,12 @@ Our team collaborates through GitHub for code management, Discord for daily comm
 \item Next steps: Prepare scripts for final testing on unseen data; analyze and summarize model results; contribute to the final report and presentation.
 \end{itemize}
 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Figs/google_sheet_tracking.png}
+\end{center}
+\caption{An image of the Google Sheet we used to track, assign, and efficiently take on tasks.}
+\end{figure}
 
 \section{Notable Contributions}
 
@@ -167,7 +157,7 @@ Label information was extracted from the diagnosis\_3 field in the BCN20000 meta
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.5\textwidth]{Figs/sample_class_images.png}
+\includegraphics[width=0.6\textwidth]{Figs/sample_class_images.png}
 \end{center}
 \caption{Sample resized and labelled images from each of the 9 classes in the combined dataset.}
 \end{figure}
@@ -180,18 +170,18 @@ Approximately 1,000 images labeled as scars or left unlabeled were grouped under
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.5\textwidth]{Figs/hair_removal_filter.png}
+\includegraphics[width=0.6\textwidth]{Figs/hair_removal_filter.png}
 \end{center}
 \caption{Effect of hair removal filter at thresholds 5, 10, and 15 on sample melanoma image. Filter removes hair and measurement lines from the image.}
 \end{figure}
 
 \subsubsection{Dataset Statistics}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.8\textwidth]{Figs/class_distribution.png}
 \end{center}
-\caption{Class distribution of combined dataset.}
+\caption{Class distribution of combined dataset, imbalanced with nevus as the majority class.}
 \end{figure}
 
 \begin{table}[h]
@@ -213,11 +203,9 @@ Approximately 1,000 images labeled as scars or left unlabeled were grouped under
 \end{center}
 \end{table}
 
-Dataset is imbalanced with nevus as the majority class.
-
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
-\includegraphics[width=0.8\textwidth]{Figs/dataset_split_distribution.png}
+\includegraphics[width=0.7\textwidth]{Figs/dataset_split_distribution.png}
 \end{center}
 \caption{Even class distribution between training, validation, and testing datasets.}
 \end{figure}
@@ -244,14 +232,16 @@ Our final model will be evaluated on the dedicated test data containing 4,446 im
 
 \subsection{Baseline Model}
 
-For our baseline model, we initially considered using simpler SVM or KNN algorithms to compare our model to. However, due to the complexity of skin detection, a standalone SVM or KNN is unlikely to outperform random chance. As such, we chose to first extract the features of the images using a pre-trained model (in this case the ResNet-18) and train a KNN model using the extracted features. In short, we imported the ResNet-18 and removed the fully-connected layers, only preserving the convolutional and average pool layers, and used it to extract the features of all the images in our dataset. The features were then used as data to fit a KNN model. The final test accuracy of this baseline model was only 56.32\% with the F1-scores not being acceptable for real-world applications. However, this model performs better than chance (11.11\%), and serves as a suitable baseline model for this project.
-
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.6\textwidth]{Figs/baseline_performance.png}
 \end{center}
 \caption{Accuracy, precision, recall, and F1-score of the baseline model. This model struggles with the imbalanced dataset, with a high F1-score for the most common class, but completely fails at identifying the less common classes.}
 \end{figure}
+
+
+For our baseline model, we initially considered using simpler SVM or KNN algorithms to compare our model to. However, due to the complexity of skin detection, a standalone SVM or KNN is unlikely to outperform random chance. As such, we chose to first extract the features of the images using a pre-trained model (in this case the ResNet-18) and train a KNN model using the extracted features. In short, we imported the ResNet-18 and removed the fully-connected layers, only preserving the convolutional and average pool layers, and used it to extract the features of all the images in our dataset. The features were then used as data to fit a KNN model. The final test accuracy of this baseline model was only 56.32\% with the F1-scores not being acceptable for real-world applications. However, this model performs better than chance (11.11\%), and serves as a suitable baseline model for this project.
+
 
 \subsection{Primary Model}
 
@@ -301,14 +291,14 @@ CRITERION & CrossEntropyLoss (smoothing=0.1) & Loss function used \\
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Figs/confusion_matrix.png}
+\includegraphics[width=1.0\textwidth]{Figs/confusion_matrix.png}
 \end{center}
 \caption{Confusion matrix of best model. The model predicts most classes effectively. However, it continues to confuse melanoma with nevus, actinic keratosis with BCC, and seborrheic keratosis with nevus, and SCC with BCC. In general, the model must reduce the chance of dangerous conditions like melanoma from being misclassified as benign conditions like nevi.}
 \end{figure}
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.5\textwidth]{Figs/training_validation_loss.png}
+\includegraphics[width=0.7\textwidth]{Figs/training_validation_loss.png}
 \end{center}
 \caption{Best model validation and training loss per epoch. Train loss is steadily lower than validation loss due to the effects of WeightedRandomSampler, which makes the class distribution seen by the model in training different than in validation.}
 \end{figure}
@@ -317,7 +307,7 @@ The 512 × 512 images were resized and augmented to 224 × 224 images with rando
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Figs/validation_metrics.png}
+\includegraphics[width=0.8\textwidth]{Figs/validation_metrics.png}
 \end{center}
 \caption{Best model validation accuracy, precision, recall, and F1 per epoch. Validation metrics plateau after epoch 35.}
 \end{figure}
