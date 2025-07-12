@@ -252,12 +252,19 @@ To develop an effective skin condition classifier, we tested several models with
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Figs/model_architecture.png}
+\includegraphics[width=0.6\textwidth]{Figs/model_architecture.png}
 \end{center}
-\caption{Architecture of the best-performing model. The model uses a ResNet-34 convolutional backbone as a feature extractor, followed by a custom two-layer fully connected classifier. ResNet-34 includes multiple convolutional blocks with residual connections and average pooling. Data transformations are applied to input images during training to improve generalization.}
+\caption{Diagram depicting the architecture of our current best-performing model. The model uses a ResNet-34 convolutional backbone as a feature extractor.}
 \end{figure}
 
 Currently, our best performing classifier exhibits a validation accuracy of 81.95\%, precision of 79.82\%, recall of 71.34\%, and F1 of 74.91\%. This model outperforms the baseline model and may still improve with further training. This model leverages a pre-trained ResNet-34 backbone for feature extraction, followed by a two-layer fully connected classifier. The classifier includes ReLU activation between the layers and applies batch normalization and dropout (with a rate of 0.5) before each linear transformation. The first linear layer receives the flattened output features from the ResNet-34 and projects them into a 512-dimensional hidden space. The final linear layer maps these features to 9 output units, corresponding to the number of skin lesion classes.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{Figs/validation_metrics.png}
+\end{center}
+\caption{Best model validation accuracy, precision, recall, and F1 per epoch.}
+\end{figure}
 
 
 \begin{table}[h]
@@ -301,19 +308,14 @@ CRITERION & CrossEntropyLoss (smoothing=0.1) & Loss function used \\
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Figs/training_validation_loss.png}
+\includegraphics[width=0.9\textwidth]{Figs/training_validation_loss.png}
 \end{center}
 \caption{Best model validation and training loss per epoch. Train loss is steadily lower than validation loss due to the effects of WeightedRandomSampler, which makes the class distribution seen by the model in training different than in validation.}
 \end{figure}
 
 The 512 × 512 images were resized and augmented to 224 × 224 images with random rotations and reflections to reduce model complexity. The model is trained using the Adam optimizer with an initial learning rate of 0.0003 and a weight decay of 0.0001. Cross-entropy loss with label smoothing ($\varepsilon$ = 0.1) is used to prevent overconfident predictions. A learning rate scheduler (ReduceLROnPlateau) monitors validation accuracy and reduces the learning rate by a factor of 0.5 if no improvement is seen for 2 consecutive epochs. We trained our model for 45 epochs using early stopping with patience of 10 epochs. Due to the data imbalance, precision, recall, and F1 score were measured in addition to loss and accuracy.
 
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width=0.8\textwidth]{Figs/validation_metrics.png}
-\end{center}
-\caption{Best model validation accuracy, precision, recall, and F1 per epoch. Validation metrics plateau after epoch 35.}
-\end{figure}
+
 
 \subsubsection{Challenges}
 
@@ -332,6 +334,7 @@ To train our model we used a NVIDIA GeForce RTX 4050 GPU with a VRAM of 6 GB. Us
 Training on larger models like ResNet-50 led to sharp declines in training loss with little plateauing validation loss, indicating overfitting. To prevent overfitting, we applied two dropout layers of 0.5 to prevent the model from relying too heavily on specific neural pathways, used the smaller ResNet-34 and froze layers to reduce model size, and weight decay of 0.0001 to prevent overreliance on large weights. Data augmentation of the training set also reduced overfitting by preventing the model from memorizing images in their default orientations.
 
 \label{last_page}
+\pagebreak
 
 \bibliography{APS360_ref}
 \bibliographystyle{iclr2022_conference}

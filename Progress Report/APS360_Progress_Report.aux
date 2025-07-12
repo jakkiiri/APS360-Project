@@ -33,16 +33,16 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Baseline Model}{6}{subsection.3.2}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Accuracy, precision, recall, and F1-score of the baseline model. This model struggles with the imbalanced dataset, with a high F1-score for the most common class, but completely fails at identifying the less common classes.}}{6}{figure.8}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Primary Model}{7}{subsection.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Architecture of the best-performing model. The model uses a ResNet-34 convolutional backbone as a feature extractor, followed by a custom two-layer fully connected classifier. ResNet-34 includes multiple convolutional blocks with residual connections and average pooling. Data transformations are applied to input images during training to improve generalization.}}{7}{figure.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Challenges}{7}{subsubsection.3.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Diagram depicting the architecture of our current best-performing model. The model uses a ResNet-34 convolutional backbone as a feature extractor.}}{7}{figure.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Best model validation accuracy, precision, recall, and F1 per epoch.}}{7}{figure.10}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Best model hyperparameter values}}{8}{table.2}\protected@file@percent }
 \newlabel{hyperparameters}{{2}{8}{Best model hyperparameter values}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Confusion matrix of best model. The model predicts most classes effectively. However, it continues to confuse melanoma with nevus, actinic keratosis with BCC, and seborrheic keratosis with nevus, and SCC with BCC. In general, the model must reduce the chance of dangerous conditions like melanoma from being misclassified as benign conditions like nevi.}}{8}{figure.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Confusion matrix of best model. The model predicts most classes effectively. However, it continues to confuse melanoma with nevus, actinic keratosis with BCC, and seborrheic keratosis with nevus, and SCC with BCC. In general, the model must reduce the chance of dangerous conditions like melanoma from being misclassified as benign conditions like nevi.}}{8}{figure.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Best model validation and training loss per epoch. Train loss is steadily lower than validation loss due to the effects of WeightedRandomSampler, which makes the class distribution seen by the model in training different than in validation.}}{9}{figure.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Challenges}{9}{subsubsection.3.3.1}\protected@file@percent }
+\newlabel{last_page}{{3.3.1}{9}{Challenges}{subsubsection.3.3.1}{}}
 \bibdata{APS360_ref}
 \bibcite{american_academy_dermatology}{{1}{}{{American Academy of Dermatology}}{{}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Best model validation and training loss per epoch. Train loss is steadily lower than validation loss due to the effects of WeightedRandomSampler, which makes the class distribution seen by the model in training different than in validation.}}{9}{figure.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Best model validation accuracy, precision, recall, and F1 per epoch. Validation metrics plateau after epoch 35.}}{9}{figure.12}\protected@file@percent }
-\newlabel{last_page}{{3.3.1}{9}{Challenges}{subsubsection.3.3.1}{}}
 \bibcite{canadian_dermatology_association}{{2}{}{{Canadian Dermatology Association}}{{}}}
 \bibcite{isic_bcn20000}{{3}{2018}{{International Skin Imaging Collaboration (ISIC)}}{{}}}
 \bibcite{kalpana2025enhancing}{{4}{2025}{{Kalpana et~al.}}{{Kalpana, Senthilselvi, Muruganandam, and Kumar}}}

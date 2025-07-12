@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.1.20)  11 JUL 2025 18:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2025.1.20)  11 JUL 2025 20:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -508,48 +508,26 @@ l.247
 File: Figs/model_architecture.png Graphic file (type png)
 <use Figs/model_architecture.png>
 Package pdftex.def Info: Figs/model_architecture.png  used on input line 255.
-(pdftex.def)             Requested size: 278.23827pt x 134.86177pt.
+(pdftex.def)             Requested size: 238.49341pt x 115.59792pt.
+<Figs/validation_metrics.png, id=135, 1040.688pt x 572.3784pt>
+File: Figs/validation_metrics.png Graphic file (type png)
+<use Figs/validation_metrics.png>
+Package pdftex.def Info: Figs/validation_metrics.png  used on input line 264.
+(pdftex.def)             Requested size: 278.23827pt x 153.03328pt.
 
-Overfull \hbox (7.34973pt too wide) in paragraph at lines 291--291
+Overfull \hbox (7.34973pt too wide) in paragraph at lines 298--298
 []|\OT1/ptm/m/n/9 WeightedRandomSampler| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 291--291
+Underfull \hbox (badness 10000) in paragraph at lines 298--298
 []|\OT1/ptm/m/n/9 ReduceLROnPlateau
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 291--291
+Underfull \hbox (badness 10000) in paragraph at lines 298--298
 []|\OT1/ptm/m/n/9 CrossEntropyLoss
  []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<Figs/confusion_matrix.png, id=135, 1040.688pt x 572.3784pt>
-File: Figs/confusion_matrix.png Graphic file (type png)
-<use Figs/confusion_matrix.png>
-Package pdftex.def Info: Figs/confusion_matrix.png  used on input line 297.
-(pdftex.def)             Requested size: 397.48499pt x 218.61523pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<Figs/training_validation_loss.png, id=136, 722.7pt x 433.62pt>
-File: Figs/training_validation_loss.png Graphic file (type png)
-<use Figs/training_validation_loss.png>
-Package pdftex.def Info: Figs/training_validation_loss.png  used on input line 304.
-(pdftex.def)             Requested size: 278.23827pt x 166.9409pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<Figs/validation_metrics.png, id=137, 1040.688pt x 572.3784pt>
-File: Figs/validation_metrics.png Graphic file (type png)
-<use Figs/validation_metrics.png>
-Package pdftex.def Info: Figs/validation_metrics.png  used on input line 313.
-(pdftex.def)             Requested size: 317.9892pt x 174.89394pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
@@ -557,32 +535,50 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.325 
-       <./Figs/model_architecture.png>]
+l.300 \end{table}
+                 
+pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.300 \end{table}
+                  <./Figs/model_architecture.png> <./Figs/validation_metrics.png>]
+<Figs/confusion_matrix.png, id=145, 1040.688pt x 572.3784pt>
+File: Figs/confusion_matrix.png Graphic file (type png)
+<use Figs/confusion_matrix.png>
+Package pdftex.def Info: Figs/confusion_matrix.png  used on input line 304.
+(pdftex.def)             Requested size: 397.48499pt x 218.61523pt.
+<Figs/training_validation_loss.png, id=146, 722.7pt x 433.62pt>
+File: Figs/training_validation_loss.png Graphic file (type png)
+<use Figs/training_validation_loss.png>
+Package pdftex.def Info: Figs/training_validation_loss.png  used on input line 311.
+(pdftex.def)             Requested size: 357.73405pt x 214.63925pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
 
 [8
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.328 T
-       o train our model we used a NVIDIA GeForce RTX 4050 GPU with a VRAM o...
-pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.328 T
-       o train our model we used a NVIDIA GeForce RTX 4050 GPU with a VRAM o... <./Figs/confusion_matrix.png>] (APS360_Progress_Report.bbl
-
-[9
+l.324 \textbf{1. Dataset imbalance}
+                                   
 pdfTeX warning (ext4): destination with the same identifier (name{figure.11}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.14 
-     
+l.324 \textbf{1. Dataset imbalance}
+                                    <./Figs/confusion_matrix.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[9
 pdfTeX warning (ext4): destination with the same identifier (name{figure.12}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.14 
-      <./Figs/training_validation_loss.png> <./Figs/validation_metrics.png>])
+l.338 
+       <./Figs/training_validation_loss.png>] (APS360_Progress_Report.bbl)
 
 [10] (APS360_Progress_Report.aux)
  ***********
@@ -595,13 +591,13 @@ Package rerunfilecheck Info: File `APS360_Progress_Report.out' has not changed.
 Here is how much of TeX's memory you used:
  11551 strings out of 473536
  175714 string characters out of 5714472
- 590467 words of memory out of 5000000
+ 588467 words of memory out of 5000000
  34532 multiletter control sequences out of 15000+600000
  586383 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,1061b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1061b,508s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on APS360_Progress_Report.pdf (10 pages, 3992361 bytes).
+Output written on APS360_Progress_Report.pdf (10 pages, 3992182 bytes).
 PDF statistics:
  215 PDF objects out of 1000 (max. 8388607)
  46 named destinations out of 1000 (max. 500000)

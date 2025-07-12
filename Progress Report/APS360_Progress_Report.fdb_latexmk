@@ -1,17 +1,17 @@
 # Fdb version 4
-["bibtex APS360_Progress_Report"] 1752274631.08543 "APS360_Progress_Report.aux" "APS360_Progress_Report.bbl" "APS360_Progress_Report" 1752274634.02517 0
+["bibtex APS360_Progress_Report"] 1752280550.15115 "APS360_Progress_Report.aux" "APS360_Progress_Report.bbl" "APS360_Progress_Report" 1752280553.88065 0
   "./APS360_ref.bib" 1752189704 2822 e1c61b18da4ef1d3f3f3de2dff49f7e5 ""
   "./iclr2022_conference.bst" 1752189008 26973 aa1df73f8afb5963eb2fc74f4c7630c1 ""
-  "APS360_Progress_Report.aux" 1752274633 6797 70776a894712bbcd0617df3f1318f35e "pdflatex"
+  "APS360_Progress_Report.aux" 1752280552 6537 8a6bc6cdc295e988e0ca594723211af6 "pdflatex"
   (generated)
   "APS360_Progress_Report.bbl"
   "APS360_Progress_Report.blg"
   (rewritten before read)
-["pdflatex"] 1752274631.40328 "c:/Users/Jordan/Documents/University/APS360/Project/APS360-Project/Progress Report/APS360_Progress_Report.tex" "APS360_Progress_Report.pdf" "APS360_Progress_Report" 1752274634.0258 0
-  "APS360_Progress_Report.aux" 1752274633 6797 70776a894712bbcd0617df3f1318f35e "pdflatex"
-  "APS360_Progress_Report.bbl" 1752274631 2857 675455bdc8b4c6aa7d2fc80d666c90ed "bibtex APS360_Progress_Report"
-  "APS360_Progress_Report.out" 1752274633 2038 523404edc3c0409969ef98d937a77a04 "pdflatex"
-  "APS360_Progress_Report.tex" 1752274627 24780 f8b70bb3326c085ff65e439c51f397b1 ""
+["pdflatex"] 1752280550.53083 "c:/Users/Jordan/Documents/University/APS360/Project/APS360-Project/Progress Report/APS360_Progress_Report.tex" "APS360_Progress_Report.pdf" "APS360_Progress_Report" 1752280553.88141 0
+  "APS360_Progress_Report.aux" 1752280552 6537 8a6bc6cdc295e988e0ca594723211af6 "pdflatex"
+  "APS360_Progress_Report.bbl" 1752280550 2857 675455bdc8b4c6aa7d2fc80d666c90ed "bibtex APS360_Progress_Report"
+  "APS360_Progress_Report.out" 1752280552 2038 523404edc3c0409969ef98d937a77a04 "pdflatex"
+  "APS360_Progress_Report.tex" 1752280540 24536 10c869b8c7d2ab2e91c06a5d93933d35 ""
   "C:/Users/Jordan/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1752189713 133807 2528f502faa7488577b38de1fae4f31e ""
   "C:/Users/Jordan/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1737421845 12013877 b7b0f23b22b4526cdf84a7903054bab5 ""
   "C:/Users/Jordan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -140,7 +140,7 @@
   "Figs/system_visualization.png" 1752173212 423477 7a728ec7c7f6c9504aa9eb6b755ae5c8 ""
   "Figs/training_validation_loss.png" 1752173212 39188 a51d7a26ea90e09878cc03960c5b5c14 ""
   "Figs/validation_metrics.png" 1752173212 115956 1eaf572e7c8cf16d83752bbd28ed9ffd ""
-  "c:/Users/Jordan/Documents/University/APS360/Project/APS360-Project/Progress Report/APS360_Progress_Report.tex" 1752274627 24780 f8b70bb3326c085ff65e439c51f397b1 ""
+  "c:/Users/Jordan/Documents/University/APS360/Project/APS360-Project/Progress Report/APS360_Progress_Report.tex" 1752280540 24536 10c869b8c7d2ab2e91c06a5d93933d35 ""
   "fancyhdr.sty" 1752189008 20521 e5d13d98d57bd53d4fed3aa61bd29c86 ""
   "iclr2022_conference.sty" 1752189008 9167 4f484121d9ee5c46ae7b712b095a6d14 ""
   "math_commands.tex" 1752189008 12284 a71653715108dc62b66e3a0bde0307d8 ""
