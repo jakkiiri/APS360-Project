@@ -9,12 +9,12 @@ from collections import Counter
 
 # === Paths ===
 datasets = {
-    'HAM10000': {
+    'HAM': {
         'img_dirs': [
-            r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\HAM10000_images_part_1',
-            r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\HAM10000_images_part_2'
+            r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\2\HAM10000_images_part_1',
+            r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\2\HAM10000_images_part_2'
         ],
-        'meta': r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\HAM10000_metadata.csv',
+        'meta': r'C:\Users\shore\Desktop\APS360\Datasets\HAM10000\2\HAM10000_metadata.csv',
         'id_col': 'image_id',
         'label_col': 'dx'
     },
@@ -30,7 +30,13 @@ datasets = {
     },
     'BCN': {
         'img_dirs': [r'C:\Users\shore\Desktop\APS360\Datasets\BCN20000_Images'],
-        'meta': r'C:\Users\shore\Desktop\APS360\Datasets\BCN20000_metadata.csv',
+        'meta': r'C:\Users\shore\Desktop\APS360\Datasets\bcn20000_metadata_2025-07-30.csv',
+        'id_col': 'isic_id',
+        'label_col': 'diagnosis_3'
+    },
+    'DERM12345': {
+        'img_dirs': [r'C:\Users\shore\Desktop\APS360\Datasets\derm12345\images'],
+        'meta': r'C:\Users\shore\Desktop\APS360\Datasets\derm12345.csv',
         'id_col': 'isic_id',
         'label_col': 'diagnosis_3'
     }
@@ -47,32 +53,29 @@ def map_label(source, label_raw):
     label = label_raw.strip().lower()
 
     if source == 'HAM':
-        code = label_raw.strip().lower()
-        if code == 'nv': return 'nevus'
-        if code == 'mel': return 'melanoma'
-        if code == 'bcc': return 'bcc'
-        if code == 'bkl': return 'seborrheic_keratosis'
-        if code == 'akiec': return 'actinic_keratosis'
-        if code == 'vasc': return 'vascular_lesion'
-        if code == 'df': return 'dermatofibroma'
+        if label == 'nv': return 'nevus'
+        if label == 'mel': return 'melanoma'
+        if label == 'bcc': return 'bcc'
+        if label == 'bkl': return 'keratosis'
+        if label == 'akiec': return 'actinic_keratosis'
+        if label == 'vasc': return 'vascular_lesion'
+        if label == 'df': return 'dermatofibroma'
         return None
 
     if source == 'PAD':
-        code = label_raw.strip().upper()
-        if code == 'NEV': return 'nevus'
-        if code == 'MEL': return 'melanoma'
-        if code == 'BCC': return 'bcc'
-        if code == 'ACK': return 'actinic_keratosis'
-        if code == 'SEK': return 'seborrheic_keratosis'
-        if code == 'SCC': return 'scc'
+        if label == 'nev': return 'nevus'
+        if label == 'mel': return 'melanoma'
+        if label == 'bcc': return 'bcc'
+        if label == 'ack': return 'actinic_keratosis'
+        if label == 'sek': return 'keratosis'
+        if label == 'scc': return 'scc'
         return None
 
     if source == 'BCN':
         if 'nevus' in label: return 'nevus'
         if 'melanoma' in label: return 'melanoma'
         if 'actinic keratosis' in label: return 'actinic_keratosis'
-        if 'seborrheic keratosis' in label: return 'seborrheic_keratosis'
-        if 'keratosis' in label: return 'other_keratosis'
+        if 'seborrheic keratosis' in label or 'keratosis' in label: return 'keratosis'
         if 'basal cell carcinoma' in label: return 'bcc'
         if 'squamous cell carcinoma' in label: return 'scc'
         if 'vascular' in label: return 'vascular_lesion'
@@ -80,52 +83,63 @@ def map_label(source, label_raw):
         if 'dermatofibroma' in label: return 'dermatofibroma'
         return None
 
+    if source == 'DERM12345':
+        if 'nevus' in label: return 'nevus'
+        if 'melanoma' in label: return 'melanoma'
+        if 'basal cell' in label or 'bcc' in label: return 'bcc'
+        if 'squamous cell' in label or 'scc' in label: return 'scc'
+        if 'actinic' in label: return 'actinic_keratosis'
+        if 'seborrheic' in label or 'keratosis' in label: return 'keratosis'
+        if 'dermatofibroma' in label: return 'dermatofibroma'
+        if 'lentigo' in label: return 'lentigo'
+        if 'vascular' in label or 'hemangioma' in label: return 'vascular_lesion'
+        return None
+
 # === Load and Process Datasets ===
-records = []
+all_records = []
 missing_images = []
 other_labels_counter = Counter()
 
-# HAM10000
-df_ham = pd.read_csv(datasets['HAM10000']['meta'])
-for idx, row in tqdm(df_ham.iterrows(), total=len(df_ham), desc='Processing HAM10000'):
-    img_name = f"{row[datasets['HAM10000']['id_col']]}.jpg"
-    found = False
-    for d in datasets['HAM10000']['img_dirs']:
-        src = os.path.join(d, img_name)
-        if os.path.exists(src):
-            records.append({'img_name': img_name, 'src': src, 'label_raw': row[datasets['HAM10000']['label_col']], 'source': 'HAM'})
-            found = True
-            break
-    if not found:
-        missing_images.append(img_name)
+for dataset_name, config in datasets.items():
+    records = []
+    df = pd.read_csv(config['meta'])
 
-# PAD-UFES
-df_pad = pd.read_csv(datasets['PAD']['meta'])
-for idx, row in tqdm(df_pad.iterrows(), total=len(df_pad), desc='Processing PAD-UFES'):
-    img_name = row[datasets['PAD']['id_col']]
-    found = False
-    for d in datasets['PAD']['img_dirs']:
-        src = os.path.join(d, img_name)
-        if os.path.exists(src):
-            records.append({'img_name': img_name, 'src': src, 'label_raw': row[datasets['PAD']['label_col']], 'source': 'PAD'})
-            found = True
-            break
-    if not found:
-        missing_images.append(img_name)
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc=f'Processing {dataset_name}'):
+        img_base = str(row[config['id_col']]).strip()
+        possible_exts = ['.jpg', '.jpeg', '.png']
+        found = False
+        for ext in possible_exts:
+            img_name = f"{img_base}{ext}"
+            for d in config['img_dirs']:
+                src = os.path.join(d, img_name)
+                if os.path.exists(src):
+                    records.append({
+                        'img_name': img_name,
+                        'src': src,
+                        'label_raw': str(row[config['label_col']]),
+                        'source': dataset_name
+                    })
+                    found = True
+                    break
+            if found:
+                break
+        if not found:
+            missing_images.append(img_base)
 
-# BCN20000
-df_bcn = pd.read_csv(datasets['BCN']['meta'])
-for idx, row in tqdm(df_bcn.iterrows(), total=len(df_bcn), desc='Processing BCN20000'):
-    img_name = f"{row[datasets['BCN']['id_col']]}.jpg"
-    src = os.path.join(datasets['BCN']['img_dirs'][0], img_name)
-    if os.path.exists(src):
-        records.append({'img_name': img_name, 'src': src, 'label_raw': row[datasets['BCN']['label_col']], 'source': 'BCN'})
+    # === Downsample Nevus Class in This Dataset ===
+    nevus_records = [r for r in records if map_label(r['source'], r['label_raw']) == 'nevus']
+    other_records = [r for r in records if map_label(r['source'], r['label_raw']) != 'nevus']
+
+    if len(nevus_records) > 2000:
+        nevus_sampled = pd.DataFrame(nevus_records).sample(n=2500, random_state=42).to_dict(orient='records')
     else:
-        missing_images.append(img_name)
+        nevus_sampled = nevus_records
+
+    all_records.extend(nevus_sampled + other_records)
 
 # === Resize and Save Images ===
 final = []
-for rec in tqdm(records, desc='Resizing and Saving'):
+for rec in tqdm(all_records, desc='Resizing and Saving'):
     label = map_label(rec['source'], rec['label_raw'])
     if not label:
         other_labels_counter[rec['label_raw']] += 1

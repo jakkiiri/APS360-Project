@@ -4,7 +4,7 @@ import requests
 import time
 
 # Load BCN20000 metadata
-metadata_csv = r'C:\Users\shore\Desktop\APS360\Datasets\BCN20000_metadata.csv'
+metadata_csv = r'C:\Users\shore\Desktop\APS360\Datasets\bcn20000_metadata_2025-07-30.csv'
 save_dir = r'C:\Users\shore\Desktop\APS360\Datasets\BCN20000_Images'
 os.makedirs(save_dir, exist_ok=True)
 
@@ -18,10 +18,10 @@ if not os.path.exists(label_file_path):
         label_file.write('filename,label\n')
 
 # Set starting index based on where you left off
-start_index = metadata.index[metadata['isic_id'] == 'ISIC_0069998'][0]
+#start_index = metadata.index[metadata['isic_id'] == 'ISIC_0069998'][0]
 
 # Download remaining images
-for idx in range(start_index, len(metadata)):
+for idx in range(len(metadata)):
     row = metadata.iloc[idx]
     isic_id = row['isic_id']
     label = row['diagnosis_1']  # Adjust if label column is named differently
