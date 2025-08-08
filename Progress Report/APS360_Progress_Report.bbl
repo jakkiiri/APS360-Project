@@ -1,0 +1,66 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[{American Academy of Dermatology}()]{american_academy_dermatology}
+{American Academy of Dermatology}.
+\newblock Burden of skin disease.
+\newblock URL
+  \url{https://www.aad.org/member/clinical-quality/clinical-care/bsd}.
+\newblock Accessed: Jul. 9th, 2025.
+
+\bibitem[{Canadian Dermatology
+  Association}()]{canadian_dermatology_association}
+{Canadian Dermatology Association}.
+\newblock Skin conditions.
+\newblock URL
+  \url{https://dermatology.ca/public-patients/diseases-conditions/skin-conditions/}.
+\newblock Accessed: Jul. 9th, 2025.
+
+\bibitem[{International Skin Imaging Collaboration
+  (ISIC)}(2018)]{isic_bcn20000}
+{International Skin Imaging Collaboration (ISIC)}.
+\newblock Isic archive - collection 249, 2018.
+\newblock URL \url{https://api.isic-archive.com/collections/249/}.
+
+\bibitem[Kalpana et~al.(2025)Kalpana, Senthilselvi, Muruganandam, and
+  Kumar]{kalpana2025enhancing}
+B.~Kalpana, A.~Senthilselvi, S.~Muruganandam, and S.~V. Kumar.
+\newblock Enhancing skin disease diagnosis: Light gbm-dms algorithm for
+  accurate image classification.
+\newblock \emph{Cognitive Computation}, 17\penalty0 (3):\penalty0 1--18, 2025.
+
+\bibitem[Li et~al.(2024)Li, Patrick, Sreeskandarajan, Kang, Kahlenberg,
+  Gudjonsson, He, and Tsoi]{li2024epidemiological}
+Q.~Li, M.~T. Patrick, S.~Sreeskandarajan, J.~Kang, J.~M. Kahlenberg, J.~E.
+  Gudjonsson, Z.~He, and L.~C. Tsoi.
+\newblock Large-scale epidemiological analysis of common skin diseases to
+  identify shared and unique comorbidities and demographic factors.
+\newblock \emph{Frontiers in Immunology}, 14, January 2024.
+\newblock URL \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC10800546/}.
+
+\bibitem[Mahdavi(2022)]{pad_ufes_dataset}
+M.~Mahdavi.
+\newblock Skin cancer dataset, 2022.
+\newblock URL \url{https://www.kaggle.com/datasets/mahdavi1202/skin-cancer}.
+
+\bibitem[{McGill Newsroom}(2022)]{mcgill_melanoma}
+{McGill Newsroom}.
+\newblock Melanoma map shows skin cancer is on the rise in canada.
+\newblock \emph{Health e-News (McGill University)}, June 2022.
+\newblock URL
+  \url{https://healthenews.mcgill.ca/melanoma-map-shows-skin-cancer-is-on-the-rise-in-canada/}.
+\newblock Accessed: Jul. 9th, 2025.
+
+\bibitem[Tschandl et~al.(2018)Tschandl, Rosendahl, and
+  Kittler]{ham10000_dataset}
+P.~Tschandl, C.~Rosendahl, and H.~Kittler.
+\newblock Ham10000 dataset: A large collection of multi-source dermatoscopic
+  images of common pigmented skin lesions, 2018.
+\newblock URL
+  \url{https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000}.
+
+\end{thebibliography}
