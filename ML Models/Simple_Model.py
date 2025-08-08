@@ -13,16 +13,36 @@ import numpy as np
 from PIL import Image
 
 # --- Configuration ---
-split_dir = r'C:\Users\shore\Desktop\APS360\Datasets\DataSplit'
+split_dir = r'C:\Users\shore\Desktop\APS360\Datasets\DataSplit2'
 cache_root = r'C:\Users\shore\Desktop\APS360\Datasets\Cache'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+def cache_dataset(split_dir, cache_dir, transform, label_mapping):
+    os.makedirs(cache_dir, exist_ok=True)
+    for label_name in os.listdir(split_dir):
+        class_path = os.path.join(split_dir, label_name)
+        if not os.path.isdir(class_path):
+            continue
+
+        target_label = label_mapping[label_name]
+        cache_class_dir = os.path.join(cache_dir, label_name)
+        os.makedirs(cache_class_dir, exist_ok=True)
+
+        for fname in os.listdir(class_path):
+            img_path = os.path.join(class_path, fname)
+            try:
+                image = Image.open(img_path).convert("RGB")
+                tensor = transform(image)
+                save_path = os.path.join(cache_class_dir, fname.replace('.jpg', '.pt').replace('.png', '.pt'))
+                torch.save({'image': tensor, 'label': target_label}, save_path)
+            except Exception as e:
+                print(f"❌ Failed to process {img_path}: {e}")
 
 # --- Label Mapping ---
 label_mapping = {
     'nevus': 0,
     'melanoma': 1,
     'bcc': 2,
-    'seborrheic_keratosis': 3,
+    'keratosis': 3,
     'actinic_keratosis': 4,
     'scc': 5,
     'dermatofibroma': 6,
@@ -120,7 +140,33 @@ class SingleClassifier(nn.Module):
         pooled = pooled.view(pooled.size(0), -1)
 
         return self.classifier(pooled)
+    
+class SkinLesionClassifier(nn.Module):
+    def __init__(self, num_classes=9):
+        super().__init__()
+        self.backbone = models.resnet34(pretrained=True)
+        in_features = self.backbone.fc.in_features
+        self.backbone.fc = nn.Sequential(
+            nn.BatchNorm1d(in_features),
+            nn.Dropout(0.5),
+            nn.Linear(in_features, 512),
+            nn.ReLU(),
+            nn.BatchNorm1d(512),
+            nn.Dropout(0.5),
+            nn.Linear(512, num_classes)
+        )
 
+    def forward(self, x):
+        return self.backbone(x)
+
+# ---- Data Preparation ----
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(15),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
 # --- Training Loop ---
 def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model'):
     model = model.to(device)
@@ -230,7 +276,26 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
 
 # --- Run Training ---
 if __name__ == "__main__":
-    train_loader, val_loader = get_loaders(os.path.join(cache_root, 'train'), os.path.join(cache_root, 'val'))
+    train_cache = os.path.join(cache_root, 'train')
+    val_cache = os.path.join(cache_root, 'val')
+    train_split = os.path.join(split_dir, 'train')
+    val_split = os.path.join(split_dir, 'val')
+
+    # Check if cache is empty and populate it if needed
+    def is_cache_empty(path):
+        return not os.path.exists(path) or all(len(files) == 0 for _, _, files in os.walk(path))
+
+    if is_cache_empty(train_cache):
+        print("⚙️ Caching training dataset...")
+        cache_dataset(train_split, train_cache, transform, label_mapping)
+
+    if is_cache_empty(val_cache):
+        print("⚙️ Caching validation dataset...")
+        cache_dataset(val_split, val_cache, transform, label_mapping)
+
+    # Load from cache
+    train_loader, val_loader = get_loaders(train_cache, val_cache)
+
 
     for backbone_name in ['efficientnet', 'mobilenet', 'resnet']:
         print(f"\n🚀 Starting training for {backbone_name} backbone...")

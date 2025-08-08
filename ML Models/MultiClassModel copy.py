@@ -21,6 +21,7 @@ PATIENCE = 10
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CHECKPOINT_PATH = "best_model.pth"
 METRICS_PATH = "training_metrics.csv"
+CACHE_ROOT = "./cached_dataset"
 
 # ---- Model Definition ----
 class SkinLesionClassifier(nn.Module):
@@ -41,26 +42,68 @@ class SkinLesionClassifier(nn.Module):
     def forward(self, x):
         return self.backbone(x)
 
+# ---- Caching Utility ----
+def cache_dataset(input_dir, output_dir, transform):
+    os.makedirs(output_dir, exist_ok=True)
+    dataset = datasets.ImageFolder(input_dir, transform=transform)
+    for class_name, class_idx in dataset.class_to_idx.items():
+        os.makedirs(os.path.join(output_dir, class_name), exist_ok=True)
+
+    print(f"Caching dataset from {input_dir} to {output_dir}...")
+    for idx in tqdm(range(len(dataset))):
+        img, label = dataset[idx]
+        class_name = dataset.classes[label]
+        cache_path = os.path.join(output_dir, class_name, f"{idx}.pt")
+        torch.save({'image': img, 'label': label}, cache_path)
+
+class CachedDataset(torch.utils.data.Dataset):
+    def __init__(self, cache_dir):
+        self.samples = []
+        for class_dir in os.listdir(cache_dir):
+            full_path = os.path.join(cache_dir, class_dir)
+            if os.path.isdir(full_path):
+                for file in os.listdir(full_path):
+                    self.samples.append(os.path.join(full_path, file))
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        data = torch.load(self.samples[idx])
+        return data['image'], data['label']
+
 # ---- Data Preparation ----
-transform = transforms.Compose([
+base_transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(15),
+    transforms.RandomRotation(20),
+    #transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+    transforms.ColorJitter(0.2, 0.2, 0.2, 0.1),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-train_data = datasets.ImageFolder("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit\\train", transform=transform)
-val_data = datasets.ImageFolder("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit\\val", transform=transform)
+train_cache_path = os.path.join(CACHE_ROOT, "train")
+val_cache_path = os.path.join(CACHE_ROOT, "val")
 
-labels = [label for _, label in train_data]
+if not os.path.exists(train_cache_path) or not os.listdir(train_cache_path):
+    cache_dataset("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit2\\train", train_cache_path, base_transform)
+
+if not os.path.exists(val_cache_path) or not os.listdir(val_cache_path):
+    cache_dataset("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit2\\val", val_cache_path, base_transform)
+
+
+train_dataset = CachedDataset(os.path.join(CACHE_ROOT, "train"))
+val_dataset = CachedDataset(os.path.join(CACHE_ROOT, "val"))
+
+labels = [torch.load(sample)['label'] for sample in train_dataset.samples]
 class_counts = np.bincount(labels)
 weights = 1. / torch.tensor(class_counts, dtype=torch.float)
 sample_weights = torch.DoubleTensor([weights[label] for label in labels])
 sampler = WeightedRandomSampler(sample_weights, len(sample_weights))
 
-train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, sampler=sampler)
-val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, sampler=sampler)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # ---- Training Function ----
 def train_model(model, train_loader, val_loader):
@@ -75,18 +118,19 @@ def train_model(model, train_loader, val_loader):
     for epoch in range(EPOCHS):
         model.train()
         running_loss = 0
-        for imgs, labels in tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} - Training"):
-            imgs, labels = imgs.to(DEVICE), labels.to(DEVICE)
-            optimizer.zero_grad()
-            outputs = model(imgs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
+        with tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} - Training") as pbar:
+            for imgs, labels in pbar:
+                imgs, labels = imgs.to(DEVICE), labels.to(DEVICE)
+                optimizer.zero_grad()
+                outputs = model(imgs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
+                running_loss += loss.item()
+                pbar.set_postfix(loss=loss.item())
 
         train_loss = running_loss / len(train_loader)
 
-        # Validation
         model.eval()
         val_loss = 0
         preds, targets, probs = [], [], []
