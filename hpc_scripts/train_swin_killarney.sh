@@ -5,7 +5,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu:h100:1
 #SBATCH --output=logs/swin_training_%j.out
 #SBATCH --error=logs/swin_training_%j.err
 
