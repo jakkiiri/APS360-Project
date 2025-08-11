@@ -57,7 +57,8 @@ echo "Testing installations..."
 python -c "import torch; print(f'PyTorch version: {torch.__version__}')"
 python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 python -c "import timm; print(f'timm version: {timm.__version__}')"
-python -c "import wandb; print(f'wandb version: {wandb.__version__}')"
+# python -c "import wandb; print(f'wandb version: {wandb.__version__}')"  # W&B removed
+python -c "import matplotlib; print(f'matplotlib version: {matplotlib.__version__}')"
 
 echo ""
 echo "✅ Virtual environment setup complete!"

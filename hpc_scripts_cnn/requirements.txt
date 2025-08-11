@@ -1,0 +1,25 @@
+# Core ML libraries
+torch>=2.0.0
+torchvision>=0.15.0
+timm>=0.9.0
+numpy>=1.21.0
+scikit-learn>=1.0.0
+
+# Image processing and augmentation
+Pillow>=9.0.0
+albumentations>=1.3.0
+opencv-python>=4.8.0
+
+# Data handling and visualization
+pandas>=1.5.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Progress bars and utilities
+tqdm>=4.64.0
+
+# Optional: For better performance
+ninja  # For faster compilation if building from source
+
+# For mixed precision training (included in PyTorch 2.0+)
+# torch.amp is built-in, no additional requirements
