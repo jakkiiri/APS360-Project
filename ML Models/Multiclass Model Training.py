@@ -12,7 +12,7 @@ from PIL import Image
 from tqdm import tqdm
 
 # === Paths and Device ===
-original_split_dir = r'C:\Users\shore\Desktop\APS360\Datasets\DataSplit'
+original_split_dir = r'C:\Users\shore\Desktop\APS360\Datasets\DataSplit2'
 cache_dir = r'C:\Users\shore\Desktop\APS360\Datasets\Cache_Multi\multi'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

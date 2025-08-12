@@ -1,16 +1,14 @@
-# skin_lesion_training.py
-
 import os
 import torch
 import torch.nn as nn
 from torchvision import models, transforms, datasets
 from torch.utils.data import DataLoader, WeightedRandomSampler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pandas as pd
 from tqdm import tqdm
+import pandas as pd
 
 # ---- Settings ----
 NUM_CLASSES = 9
@@ -53,6 +51,7 @@ transform = transforms.Compose([
 train_data = datasets.ImageFolder("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit\\train", transform=transform)
 val_data = datasets.ImageFolder("C:\\Users\\shore\\Desktop\\APS360\\Datasets\\DataSplit\\val", transform=transform)
 
+# Class balancing
 labels = [label for _, label in train_data]
 class_counts = np.bincount(labels)
 weights = 1. / torch.tensor(class_counts, dtype=torch.float)
@@ -62,90 +61,97 @@ sampler = WeightedRandomSampler(sample_weights, len(sample_weights))
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, sampler=sampler)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
 
-# ---- Training Function ----
-def train_model(model, train_loader, val_loader):
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, verbose=True)
+# ---- Model Setup ----
+model = SkinLesionClassifier(NUM_CLASSES).to(DEVICE)
+model = SkinLesionClassifier(NUM_CLASSES).to(DEVICE)
+#model.load_state_dict(torch.load(CHECKPOINT_PATH))
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, verbose=True)
 
-    best_acc = 0
-    epochs_no_improve = 0
-    metrics_df = pd.DataFrame(columns=["epoch", "train_loss", "val_loss", "accuracy", "precision", "recall", "f1", "auc"])
+# ---- Training Loop with Early Stopping and Checkpointing ----
+train_losses, val_losses, val_accuracies = [], [], []
+precisions, recalls, f1s = [], [], []
+best_acc = 0
+epochs_no_improve = 0
 
-    for epoch in range(EPOCHS):
-        model.train()
-        running_loss = 0
-        for imgs, labels in tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} - Training"):
+metrics_df = pd.DataFrame(columns=["epoch", "train_loss", "val_loss", "accuracy", "precision", "recall", "f1"])
+'''
+for epoch in range(EPOCHS):
+    model.train()
+    epoch_loss = 0
+    with tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS}") as pbar:
+        for imgs, labels in pbar:
             imgs, labels = imgs.to(DEVICE), labels.to(DEVICE)
             optimizer.zero_grad()
             outputs = model(imgs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            running_loss += loss.item()
+            epoch_loss += loss.item()
+            pbar.set_postfix(loss=loss.item())
 
-        train_loss = running_loss / len(train_loader)
+    train_losses.append(epoch_loss / len(train_loader))
 
-        # Validation
-        model.eval()
-        val_loss = 0
-        preds, targets, probs = [], [], []
-        with torch.no_grad():
-            for imgs, labels in tqdm(val_loader, desc="Validating"):
-                imgs, labels = imgs.to(DEVICE), labels.to(DEVICE)
-                outputs = model(imgs)
-                loss = criterion(outputs, labels)
-                val_loss += loss.item()
+    # Validation
+    model.eval()
+    val_loss = 0
+    preds, targets = [], []
+    with torch.no_grad():
+        for imgs, labels in val_loader:
+            imgs, labels = imgs.to(DEVICE), labels.to(DEVICE)
+            outputs = model(imgs)
+            loss = criterion(outputs, labels)
+            val_loss += loss.item()
+            preds.extend(torch.argmax(outputs, dim=1).cpu().numpy())
+            targets.extend(labels.cpu().numpy())
 
-                softmax_outputs = torch.softmax(outputs, dim=1)
-                preds.extend(torch.argmax(softmax_outputs, dim=1).cpu().numpy())
-                targets.extend(labels.cpu().numpy())
-                probs.extend(softmax_outputs.cpu().numpy())
+    val_losses.append(val_loss / len(val_loader))
 
-        val_loss /= len(val_loader)
-        acc = accuracy_score(targets, preds)
-        prec = precision_score(targets, preds, average='macro', zero_division=0)
-        rec = recall_score(targets, preds, average='macro', zero_division=0)
-        f1 = f1_score(targets, preds, average='macro', zero_division=0)
+    acc = accuracy_score(targets, preds)
+    prec = precision_score(targets, preds, average='macro', zero_division=0)
+    rec = recall_score(targets, preds, average='macro', zero_division=0)
+    f1 = f1_score(targets, preds, average='macro', zero_division=0)
 
-        try:
-            auc = roc_auc_score(targets, probs, multi_class='ovr')
-        except:
-            auc = 0.0
+    val_accuracies.append(acc)
+    precisions.append(prec)
+    recalls.append(rec)
+    f1s.append(f1)
 
-        print(f"Epoch {epoch+1}: Train Loss={train_loss:.4f} | Val Loss={val_loss:.4f} | Acc={acc:.4f} | Prec={prec:.4f} | Recall={rec:.4f} | F1={f1:.4f} | AUC={auc:.4f}")
+    scheduler.step(acc)
+    for param_group in optimizer.param_groups:
+        print(f"Current learning rate: {param_group['lr']}")
+    print(f"Epoch {epoch+1}/{EPOCHS} | Train Loss: {train_losses[-1]:.4f} | Val Loss: {val_losses[-1]:.4f} | Val Acc: {acc:.4f} | Precision: {prec:.4f} | Recall: {rec:.4f} | F1: {f1:.4f}")
 
-        scheduler.step(acc)
+    metrics_df.loc[len(metrics_df)] = [epoch+1, train_losses[-1], val_losses[-1], acc, prec, rec, f1]
+    metrics_df.to_csv(METRICS_PATH, index=False)
 
-        metrics_df.loc[len(metrics_df)] = [epoch+1, train_loss, val_loss, acc, prec, rec, f1, auc]
-        metrics_df.to_csv(METRICS_PATH, index=False)
+    if acc > best_acc:
+        best_acc = acc
+        torch.save(model.state_dict(), CHECKPOINT_PATH)
+        print(f"✅ Saved new best model (Val Acc: {acc:.4f})")
+        epochs_no_improve = 0
+    else:
+        epochs_no_improve += 1
+        print(f"No improvement. ({epochs_no_improve}/{PATIENCE} epochs)")
 
-        if acc > best_acc:
-            best_acc = acc
-            torch.save(model.state_dict(), CHECKPOINT_PATH)
-            print(f"✅ Saved new best model (Val Acc: {acc:.4f})")
-            epochs_no_improve = 0
-        else:
-            epochs_no_improve += 1
-            print(f"No improvement. ({epochs_no_improve}/{PATIENCE} epochs)")
-
-        if epochs_no_improve >= PATIENCE:
-            print("⏹️ Early stopping triggered.")
-            break
-
-# ---- Run Training ----
-model = SkinLesionClassifier(NUM_CLASSES).to(DEVICE)
-train_model(model, train_loader, val_loader)
+    if epochs_no_improve >= PATIENCE:
+        print("⏹️ Early stopping triggered.")
+        break
+'''
+# ---- Load Best Model ----
+model.load_state_dict(torch.load(CHECKPOINT_PATH))
+print(f"\n🏆 Best model loaded from '{CHECKPOINT_PATH}' with validation accuracy: {best_acc:.4f}")
 
 # ---- Visualization ----
 metrics_df = pd.read_csv(METRICS_PATH)
-
+'''
+# ---- Combined Metrics Plot ----
 plt.figure(figsize=(12, 6))
 plt.plot(metrics_df["epoch"], metrics_df["accuracy"], label="Accuracy")
 plt.plot(metrics_df["epoch"], metrics_df["precision"], label="Precision")
 plt.plot(metrics_df["epoch"], metrics_df["recall"], label="Recall")
 plt.plot(metrics_df["epoch"], metrics_df["f1"], label="F1 Score")
-plt.plot(metrics_df["epoch"], metrics_df["auc"], label="AUC")
 plt.title("Validation Metrics Over Epochs")
 plt.xlabel("Epoch")
 plt.ylabel("Score")
@@ -153,14 +159,62 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+'''
+
+# ---- Load Metrics and Plot All Validation Metrics in One Figure ----
+metrics_df = pd.read_csv(METRICS_PATH)
+
+# Loss Plot (Train and Val)
+plt.figure(figsize=(10, 6))
+plt.plot(metrics_df["epoch"], metrics_df["train_loss"], label="Train Loss")
+plt.plot(metrics_df["epoch"], metrics_df["val_loss"], label="Val Loss")
+plt.title("Training and Validation Loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Validation Metrics in a Grid
+fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+fig.suptitle("Validation Metrics Over Epochs", fontsize=16)
+
+axs[0, 0].plot(metrics_df["epoch"], metrics_df["accuracy"], label="Accuracy", color="tab:blue")
+axs[0, 0].set_title("Validation Accuracy")
+axs[0, 0].set_xlabel("Epoch")
+axs[0, 0].set_ylabel("Accuracy")
+axs[0, 0].grid(True)
+
+axs[0, 1].plot(metrics_df["epoch"], metrics_df["precision"], label="Precision", color="tab:green")
+axs[0, 1].set_title("Validation Precision")
+axs[0, 1].set_xlabel("Epoch")
+axs[0, 1].set_ylabel("Precision")
+axs[0, 1].grid(True)
+
+axs[1, 0].plot(metrics_df["epoch"], metrics_df["recall"], label="Recall", color="tab:orange")
+axs[1, 0].set_title("Validation Recall")
+axs[1, 0].set_xlabel("Epoch")
+axs[1, 0].set_ylabel("Recall")
+axs[1, 0].grid(True)
+
+axs[1, 1].plot(metrics_df["epoch"], metrics_df["f1"], label="F1 Score", color="tab:red")
+axs[1, 1].set_title("Validation F1 Score")
+axs[1, 1].set_xlabel("Epoch")
+axs[1, 1].set_ylabel("F1 Score")
+axs[1, 1].grid(True)
+
+plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+plt.show()
+
 
 # ---- Confusion Matrix ----
+# ---- Confusion Matrix with Class Labels ----
 class_names = [
     "Actinic Keratosis", "bcc", "Dermatofibroma", "lentigo", "Melanoma",
     "nevus", "scc", "seborrheic_keratosis", "vascular_lesion"
 ]
 
-model.load_state_dict(torch.load(CHECKPOINT_PATH))
 model.eval()
 preds, targets = [], []
 with torch.no_grad():
@@ -171,11 +225,17 @@ with torch.no_grad():
         targets.extend(labels.cpu().numpy())
 
 cm = confusion_matrix(targets, preds)
+
 plt.figure(figsize=(12, 10))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=class_names,
+            yticklabels=class_names)
 plt.xlabel('Predicted Class')
 plt.ylabel('True Class')
 plt.title('Confusion Matrix on Validation Set')
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha='right')
+plt.yticks(rotation=0)
 plt.tight_layout()
 plt.show()
+
+

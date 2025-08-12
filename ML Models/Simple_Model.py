@@ -55,7 +55,7 @@ transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(15),
-    transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+    #transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
     transforms.ColorJitter(brightness=0.1, contrast=0.1),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -168,6 +168,8 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 # --- Training Loop ---
+from tqdm import tqdm  # make sure this is imported
+
 def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, backbone_name='model'):
     model = model.to(device)
 
@@ -182,7 +184,6 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     patience_counter = 0
 
     train_losses, val_losses = [], []
-
     total_start_time = time.time()
 
     for epoch in range(num_epochs):
@@ -194,7 +195,8 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         model.train()
         running_train_loss = 0
 
-        for inputs, targets in train_loader:
+        train_bar = tqdm(train_loader, desc=f"[Epoch {epoch+1}] Training", leave=False)
+        for inputs, targets in train_bar:
             inputs, targets = inputs.to(device), targets.to(device)
 
             optimizer.zero_grad()
@@ -205,17 +207,18 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
             optimizer.step()
 
             running_train_loss += loss.item()
+            train_bar.set_postfix(loss=loss.item())
 
         avg_train_loss = running_train_loss / len(train_loader)
         train_losses.append(avg_train_loss)
 
         model.eval()
         running_val_loss = 0
-
         val_labels, val_preds = [], []
 
+        val_bar = tqdm(val_loader, desc=f"[Epoch {epoch+1}] Validation", leave=False)
         with torch.no_grad():
-            for inputs, targets in val_loader:
+            for inputs, targets in val_bar:
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 logits = model(inputs)
@@ -226,6 +229,8 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
                 preds = torch.argmax(logits, dim=1).cpu().numpy()
                 val_labels.extend(targets.cpu().numpy())
                 val_preds.extend(preds)
+
+                val_bar.set_postfix(loss=loss.item())
 
         avg_val_loss = running_val_loss / len(val_loader)
         val_losses.append(avg_val_loss)
@@ -245,8 +250,8 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         print(f"\nEpoch {epoch + 1} Summary")
         print(f"Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         print(f"Multi-Class -> Acc: {acc:.4f} | Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {f1:.4f}")
-        print(f"\U0001F552 Epoch duration: {epoch_duration:.2f} seconds")
-        print(f"\U0001F552 Estimated remaining time: {estimated_remaining_time / 60:.2f} minutes")
+        print(f"🕒 Epoch duration: {epoch_duration:.2f} seconds")
+        print(f"⏳ Estimated remaining time: {estimated_remaining_time / 60:.2f} minutes")
         print(f"{'=' * 50}")
 
         if avg_val_loss < best_val_loss:
@@ -256,15 +261,17 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
         else:
             patience_counter += 1
             if patience_counter >= patience:
-                print("Early stopping triggered.")
+                print("⏹️ Early stopping triggered.")
                 break
 
         torch.cuda.empty_cache()
 
+    # Final confusion matrix
     ConfusionMatrixDisplay(confusion_matrix(val_labels, val_preds)).plot()
     plt.title(f'{backbone_name} Final Confusion Matrix')
     plt.show()
 
+    # Loss curves
     plt.figure(figsize=(10, 5))
     plt.plot(train_losses, label='Train Loss')
     plt.plot(val_losses, label='Val Loss')
@@ -273,6 +280,7 @@ def train_model(model, train_loader, val_loader, num_epochs=15, patience=3, back
     plt.title(f'{backbone_name} Training Curve')
     plt.legend()
     plt.show()
+
 
 # --- Run Training ---
 if __name__ == "__main__":
