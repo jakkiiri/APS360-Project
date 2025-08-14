@@ -138,7 +138,7 @@ class SkinDiseaseGUI:
     def setup_preprocessing(self):
         """Setup image preprocessing pipeline"""
         self.transform = A.Compose([
-            A.Resize(224, 224),
+            A.Resize(512, 512),
             A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ToTensorV2()
         ])
@@ -354,7 +354,7 @@ class SkinDiseaseGUI:
                 num_classes=len(CLASS_NAMES),
                 model_name='swin_base_patch4_window7_224',
                 pretrained=False,  # Don't load pretrained when loading checkpoint
-                image_size=224
+                image_size=512
             )
             
             # Load checkpoint using safe loading function
