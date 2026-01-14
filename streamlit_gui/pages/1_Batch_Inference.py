@@ -301,14 +301,25 @@ except Exception as e:
 
 st.divider()
 
-# Only show upload section if no results yet
-if 'batch_results' not in st.session_state or not st.session_state.batch_results:
+# Check if we have results to display
+has_results = 'batch_results' in st.session_state and st.session_state.batch_results
+
+if not has_results:
+    # ========== UPLOAD SECTION ==========
     st.markdown('<div class="section-header"><div class="section-icon">📤</div><div class="section-title">Upload Images</div></div>', unsafe_allow_html=True)
     
-    uploaded_files = st.file_uploader("Upload multiple images", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True, label_visibility="collapsed")
+    # Use unique key that changes when we want to reset
+    uploader_key = f"batch_uploader_{st.session_state.get('uploader_reset', 0)}"
+    uploaded_files = st.file_uploader(
+        "Upload multiple images", 
+        type=['jpg', 'jpeg', 'png', 'webp'], 
+        accept_multiple_files=True, 
+        label_visibility="collapsed",
+        key=uploader_key
+    )
     
     if uploaded_files:
-        st.info(f"📁 **{len(uploaded_files)} images** ready for analysis")
+        st.success(f"📁 **{len(uploaded_files)} images** ready for analysis")
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -334,10 +345,14 @@ if 'batch_results' not in st.session_state or not st.session_state.batch_results
                 progress.empty()
                 st.session_state.batch_results = results
                 st.rerun()
+    else:
+        # Show placeholder when no files uploaded
+        st.markdown('<div class="placeholder"><div class="icon">📤</div><h4>Drag & Drop Images Here</h4><p>or click to browse files</p></div>', unsafe_allow_html=True)
     
     st.divider()
 
-if 'batch_results' in st.session_state and st.session_state.batch_results:
+else:
+    # ========== RESULTS SECTION ==========
     results = st.session_state.batch_results
     df = pd.DataFrame(results)
     valid = df[df['Prediction'] != 'Error']
@@ -445,11 +460,11 @@ if 'batch_results' in st.session_state and st.session_state.batch_results:
     with c1:
         st.download_button("📥 Download CSV", df.to_csv(index=False), "results.csv", "text/csv", use_container_width=True)
     with c2:
-        if st.button("🔄 Clear", use_container_width=True):
+        if st.button("🔄 Analyze New Images", use_container_width=True):
+            # Clear results and reset uploader
             st.session_state.batch_results = None
+            st.session_state.uploader_reset = st.session_state.get('uploader_reset', 0) + 1
             st.rerun()
-else:
-    st.markdown('<div class="placeholder"><div class="icon">☁️</div><h4>No Images Uploaded</h4><p>Upload images above to begin</p></div>', unsafe_allow_html=True)
 
 st.divider()
 st.caption("AI Derm · Swin Transformer · APS360")
