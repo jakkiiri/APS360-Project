@@ -1,10 +1,6 @@
 /env
 /venv
 
-# Large model files (exceed GitHub 100MB limit)
-*.pth
-best_model/
-
 # Python cache
 __pycache__/
 *.pyc
