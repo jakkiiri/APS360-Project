@@ -301,46 +301,49 @@ except Exception as e:
 
 st.divider()
 
-st.markdown('<div class="section-header"><div class="section-icon">📤</div><div class="section-title">Upload Images</div></div>', unsafe_allow_html=True)
-
-uploaded_files = st.file_uploader("Upload multiple images", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True, label_visibility="collapsed")
-
-if uploaded_files:
-    st.info(f"📁 **{len(uploaded_files)} images** ready")
+# Only show upload section if no results yet
+if 'batch_results' not in st.session_state or not st.session_state.batch_results:
+    st.markdown('<div class="section-header"><div class="section-icon">📤</div><div class="section-title">Upload Images</div></div>', unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🔬 ANALYZE ALL", type="primary", use_container_width=True):
-            results = []
-            transform = get_transform()
-            progress = st.progress(0)
-            
-            for i, f in enumerate(uploaded_files):
-                progress.progress((i + 1) / len(uploaded_files), f"Processing {f.name}...")
-                try:
-                    img = Image.open(f).convert('RGB')
-                    tensor = transform(image=np.array(img))['image'].unsqueeze(0).to(device)
-                    with torch.no_grad():
-                        probs = F.softmax(model(tensor), dim=1)
-                        pred_idx = torch.argmax(probs, dim=1).item()
-                        conf = probs[0][pred_idx].item()
-                    results.append({'Filename': f.name, 'Prediction': DISPLAY_NAMES[CLASS_NAMES[pred_idx]], 
-                                   'Confidence': f"{conf:.1%}", 'Risk': RISK_INFO[CLASS_NAMES[pred_idx]]})
-                except:
-                    results.append({'Filename': f.name, 'Prediction': 'Error', 'Confidence': '-', 'Risk': '-'})
-            
-            progress.empty()
-            st.session_state.batch_results = results
-            st.rerun()
-
-st.divider()
+    uploaded_files = st.file_uploader("Upload multiple images", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True, label_visibility="collapsed")
+    
+    if uploaded_files:
+        st.info(f"📁 **{len(uploaded_files)} images** ready for analysis")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🔬 ANALYZE ALL", type="primary", use_container_width=True):
+                results = []
+                transform = get_transform()
+                progress = st.progress(0)
+                
+                for i, f in enumerate(uploaded_files):
+                    progress.progress((i + 1) / len(uploaded_files), f"Processing {f.name}...")
+                    try:
+                        img = Image.open(f).convert('RGB')
+                        tensor = transform(image=np.array(img))['image'].unsqueeze(0).to(device)
+                        with torch.no_grad():
+                            probs = F.softmax(model(tensor), dim=1)
+                            pred_idx = torch.argmax(probs, dim=1).item()
+                            conf = probs[0][pred_idx].item()
+                        results.append({'Filename': f.name, 'Prediction': DISPLAY_NAMES[CLASS_NAMES[pred_idx]], 
+                                       'Confidence': f"{conf:.1%}", 'Risk': RISK_INFO[CLASS_NAMES[pred_idx]]})
+                    except:
+                        results.append({'Filename': f.name, 'Prediction': 'Error', 'Confidence': '-', 'Risk': '-'})
+                
+                progress.empty()
+                st.session_state.batch_results = results
+                st.rerun()
+    
+    st.divider()
 
 if 'batch_results' in st.session_state and st.session_state.batch_results:
     results = st.session_state.batch_results
     df = pd.DataFrame(results)
     valid = df[df['Prediction'] != 'Error']
     
-    st.markdown('<div class="section-header"><div class="section-icon">📈</div><div class="section-title">Summary</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"><div class="section-icon">📈</div><div class="section-title">Analysis Summary</div></div>', unsafe_allow_html=True)
+    st.info(f"✅ **Analysis Complete** — {len(results)} images processed. Click **Clear** below to analyze new images.")
     
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total", len(results))
@@ -353,29 +356,89 @@ if 'batch_results' in st.session_state and st.session_state.batch_results:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="section-header"><div class="section-icon">🎯</div><div class="section-title">Predictions</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><div class="section-icon">🎯</div><div class="section-title">Prediction Distribution</div></div>', unsafe_allow_html=True)
         if len(valid) > 0:
             dist = valid['Prediction'].value_counts()
-            fig = go.Figure(go.Pie(labels=dist.index, values=dist.values, hole=0.5, 
-                                   marker=dict(colors=['#0ea5e9', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6'])))
-            fig.update_layout(height=350, margin=dict(l=20, r=20, t=20, b=20), showlegend=False, paper_bgcolor='rgba(0,0,0,0)')
+            fig = go.Figure(go.Pie(
+                labels=dist.index, 
+                values=dist.values, 
+                hole=0.5,
+                textinfo='label+percent',
+                textposition='outside',
+                textfont=dict(size=12, color='#e2e8f0'),
+                hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>',
+                marker=dict(colors=['#0ea5e9', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6'],
+                           line=dict(color='#1a2540', width=2))
+            ))
+            fig.update_layout(
+                height=400, 
+                margin=dict(l=20, r=20, t=50, b=20),
+                title=dict(text='Lesion Types Detected', font=dict(size=16, color='#e2e8f0'), x=0.5),
+                showlegend=True,
+                legend=dict(
+                    orientation='h',
+                    yanchor='bottom',
+                    y=-0.15,
+                    xanchor='center',
+                    x=0.5,
+                    font=dict(size=11, color='#94a3b8'),
+                    bgcolor='rgba(0,0,0,0)'
+                ),
+                paper_bgcolor='rgba(0,0,0,0)'
+            )
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        else:
+            st.info("No valid predictions to display")
     
     with col2:
-        st.markdown('<div class="section-header"><div class="section-icon">⚠️</div><div class="section-title">Risk Levels</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><div class="section-icon">⚠️</div><div class="section-title">Risk Level Summary</div></div>', unsafe_allow_html=True)
         if len(valid) > 0:
             risk_dist = valid['Risk'].value_counts().reindex(['Critical', 'High', 'Moderate', 'Low']).dropna()
             colors = {'Critical': '#ef4444', 'High': '#f97316', 'Moderate': '#f59e0b', 'Low': '#10b981'}
-            fig = go.Figure(go.Bar(x=risk_dist.index, y=risk_dist.values, 
-                                   marker=dict(color=[colors.get(r, '#0ea5e9') for r in risk_dist.index]),
-                                   text=risk_dist.values, textposition='outside'))
-            fig.update_layout(height=350, margin=dict(l=20, r=20, t=30, b=50), paper_bgcolor='rgba(0,0,0,0)', 
-                            plot_bgcolor='rgba(0,0,0,0)', xaxis=dict(tickfont=dict(color='#e2e8f0')),
-                            yaxis=dict(tickfont=dict(color='#94a3b8'), gridcolor='rgba(255,255,255,0.05)'))
+            fig = go.Figure(go.Bar(
+                x=risk_dist.index, 
+                y=risk_dist.values, 
+                marker=dict(color=[colors.get(r, '#0ea5e9') for r in risk_dist.index]),
+                text=risk_dist.values, 
+                textposition='outside',
+                textfont=dict(size=14, color='#e2e8f0'),
+                hovertemplate='<b>%{x}</b><br>Count: %{y} images<extra></extra>'
+            ))
+            fig.update_layout(
+                height=400, 
+                margin=dict(l=60, r=20, t=50, b=80),
+                title=dict(text='Risk Assessment Overview', font=dict(size=16, color='#e2e8f0'), x=0.5),
+                paper_bgcolor='rgba(0,0,0,0)', 
+                plot_bgcolor='rgba(0,0,0,0)',
+                xaxis=dict(
+                    title=dict(text='Risk Level', font=dict(size=13, color='#94a3b8')),
+                    tickfont=dict(size=12, color='#e2e8f0'),
+                    categoryorder='array',
+                    categoryarray=['Critical', 'High', 'Moderate', 'Low']
+                ),
+                yaxis=dict(
+                    title=dict(text='Number of Images', font=dict(size=13, color='#94a3b8')),
+                    tickfont=dict(color='#94a3b8'), 
+                    gridcolor='rgba(255,255,255,0.08)',
+                    dtick=1
+                )
+            )
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        else:
+            st.info("No risk data to display")
     
     st.divider()
-    st.markdown('<div class="section-header"><div class="section-icon">📋</div><div class="section-title">Results</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"><div class="section-icon">📋</div><div class="section-title">Detailed Results</div></div>', unsafe_allow_html=True)
+    
+    # Risk level legend
+    st.markdown("""
+    **Risk Level Guide:** 
+    🔴 **Critical** = Melanoma (requires immediate attention) | 
+    🟠 **High** = BCC, SCC (potentially cancerous) | 
+    🟡 **Moderate** = Actinic Keratosis (precancerous) | 
+    🟢 **Low** = Benign lesions
+    """)
+    
     st.dataframe(df, use_container_width=True, hide_index=True)
     
     c1, c2 = st.columns(2)
