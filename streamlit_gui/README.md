@@ -1,4 +1,4 @@
-# 🔬 DermAI — Intelligent Skin Lesion Analysis
+# 🔬 AI Derm — Intelligent Skin Lesion Analysis
 
 A modern, professional web interface for AI-powered skin lesion classification using Swin Transformer deep learning.
 

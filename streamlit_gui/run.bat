@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo        DermAI - Skin Lesion Analysis
+echo        AI Derm - Skin Lesion Analysis
 echo ========================================
 echo.
 
@@ -11,7 +11,7 @@ if errorlevel 1 (
     pip install -r requirements.txt
 )
 
-echo Starting DermAI...
+echo Starting AI Derm...
 streamlit run Home.py --server.headless true
 
 pause

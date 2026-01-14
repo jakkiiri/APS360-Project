@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DermAI - Skin Lesion Analysis
+AI Derm - Skin Lesion Analysis
 Ocean Blue Theme
 """
 
@@ -18,7 +18,7 @@ for name in ['torch', 'torchvision', 'timm']:
 import streamlit as st
 
 st.set_page_config(
-    page_title="DermAI - Skin Lesion Analysis",
+    page_title="AI Derm - Skin Lesion Analysis",
     page_icon="🔬",
     layout="wide"
 )
@@ -699,7 +699,7 @@ def main():
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <div class="sidebar-logo-icon">🔬</div>
-                <div class="sidebar-logo-text">DermAI</div>
+                <div class="sidebar-logo-text">AI Derm</div>
             </div>
             <div class="sidebar-tagline">AI Skin Lesion Analysis</div>
         </div>
@@ -709,7 +709,7 @@ def main():
     st.markdown("""
     <div class="hero">
         <div class="hero-badge">🔬 AI-Powered Skin Analysis</div>
-        <h1 class="hero-title"><span>DermAI</span> Skin Lesion Classifier</h1>
+        <h1 class="hero-title"><span>AI Derm</span> Skin Lesion Classifier</h1>
         <p class="hero-subtitle">
             State-of-the-art deep learning model using Swin Transformer architecture 
             to classify skin lesions into 9 categories with high accuracy.

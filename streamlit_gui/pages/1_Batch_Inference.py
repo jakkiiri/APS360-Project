@@ -17,7 +17,7 @@ for name in ['torch', 'torchvision', 'timm']:
 import streamlit as st
 
 st.set_page_config(
-    page_title="Batch Analysis | DermAI",
+    page_title="Batch Analysis | AI Derm",
     page_icon="📊",
     layout="wide"
 )
@@ -278,7 +278,7 @@ with st.sidebar:
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon">🔬</div>
-            <div class="sidebar-logo-text">DermAI</div>
+            <div class="sidebar-logo-text">AI Derm</div>
         </div>
         <div class="sidebar-tagline">AI Skin Lesion Analysis</div>
     </div>
@@ -389,4 +389,4 @@ else:
     st.markdown('<div class="placeholder"><div class="icon">☁️</div><h4>No Images Uploaded</h4><p>Upload images above to begin</p></div>', unsafe_allow_html=True)
 
 st.divider()
-st.caption("DermAI · Swin Transformer · APS360")
+st.caption("AI Derm · Swin Transformer · APS360")

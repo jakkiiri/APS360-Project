@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-About DermAI - Ocean Blue Theme
+About AI Derm - Ocean Blue Theme
 """
 
 import streamlit as st
 import warnings
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="About | DermAI", page_icon="ℹ️", layout="wide")
+st.set_page_config(page_title="About | AI Derm", page_icon="ℹ️", layout="wide")
 
 # ============================================================================
 # OCEAN BLUE THEME CSS
@@ -337,7 +337,7 @@ with st.sidebar:
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon">🔬</div>
-            <div class="sidebar-logo-text">DermAI</div>
+            <div class="sidebar-logo-text">AI Derm</div>
         </div>
         <div class="sidebar-tagline">AI Skin Lesion Analysis</div>
     </div>
@@ -346,7 +346,7 @@ with st.sidebar:
 st.markdown("""
 <div class="about-hero">
     <div class="logo">🔬</div>
-    <h1>About <span>DermAI</span></h1>
+    <h1>About <span>AI Derm</span></h1>
     <p>Advanced skin lesion classification powered by state-of-the-art deep learning, 
     built for APS360 at the University of Toronto.</p>
 </div>
@@ -357,7 +357,7 @@ st.divider()
 st.markdown('<div class="section-header"><div class="section-icon">🎯</div><div class="section-title">Project Overview</div></div>', unsafe_allow_html=True)
 
 st.markdown("""
-**DermAI** uses the **Swin Transformer** architecture—a hierarchical vision transformer with state-of-the-art 
+**AI Derm** uses the **Swin Transformer** architecture—a hierarchical vision transformer with state-of-the-art 
 image classification performance. Trained on **HAM10000**, **BCN20000**, and **PAD-UFES-20** datasets, 
 it classifies skin lesions into **9 categories** with confidence scores and risk assessments.
 """)
@@ -455,6 +455,6 @@ st.markdown("""
 
 st.markdown("""
 <div class="footer">
-    <strong>DermAI</strong> · APS360 Applied Fundamentals of Deep Learning · University of Toronto
+    <strong>AI Derm</strong> · APS360 Applied Fundamentals of Deep Learning · University of Toronto
 </div>
 """, unsafe_allow_html=True)
