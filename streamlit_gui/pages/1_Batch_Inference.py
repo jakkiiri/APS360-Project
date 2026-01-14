@@ -345,9 +345,6 @@ if not has_results:
                 progress.empty()
                 st.session_state.batch_results = results
                 st.rerun()
-    else:
-        # Show placeholder when no files uploaded
-        st.markdown('<div class="placeholder"><div class="icon">📤</div><h4>Drag & Drop Images Here</h4><p>or click to browse files</p></div>', unsafe_allow_html=True)
     
     st.divider()
 
